@@ -57,7 +57,7 @@ converter( program )
     _.each( schemas, function( schema, index )
     {
       let filename = path.join( program.out, _.last( schema.id.split( '/' ) ) );
-      fs.writeFileSync( filename, JSON.stringify( schemas, null, _.padStart( '', program.indent, ' ' ) ) )
+      fs.writeFileSync( filename, JSON.stringify( schema, null, _.padStart( '', program.indent, ' ' ) ) )
       console.log( 'File created: ' + filename );
     } )
     console.log( 'All done' );
