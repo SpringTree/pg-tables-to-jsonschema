@@ -1,0 +1,43 @@
+{
+  "name": "pg-tables-to-jsonschema",
+  "version": "0.1.0",
+  "description": "A command-line utility and module to turn postgres tables into JSON Schemas",
+  "main": "./lib/index.js",
+  "bin": {
+    "pgtables2jsonschema": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "SpringTree/pg-tables-to-jsonschema"
+  },
+  "keywords": [
+    "json-schema",
+    "postgresql",
+    "converter",
+    "command-line"
+  ],
+  "author": {
+    "name": "Mark Doeswijk",
+    "email": "mdoeswijk@gmail.com",
+    "url": "https://github.com/Qwerios"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SpringTree/pg-tables-to-jsonschema/issues"
+  },
+  "homepage": "https://github.com/SpringTree/pg-tables-to-jsonschema#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  },
+  "dependencies": {
+    "commander": "^2.11.0",
+    "jsonfile": "^4.0.0",
+    "lodash": "^4.17.4",
+    "pg-json-schema-export": "^0.13.7"
+  }
+}
