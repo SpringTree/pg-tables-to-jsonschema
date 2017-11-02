@@ -42,9 +42,9 @@ if ( program.baseUrl.substr( -1 ) !== '/' ) {
 }
 
 var fs        = require( 'fs'              );
-var converter = require( '../lib/index'    );
 var _         = require( 'lodash'          );
 var path      = require( 'path'            );
+var converter = require( path.join( global.appRoot, '../lib/index' ) );
 
 converter( program )
 .then( function( schemas )
