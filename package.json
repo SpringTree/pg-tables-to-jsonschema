@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "SpringTree/pg-tables-to-jsonschema"
+    "url": "https://github.com/SpringTree/pg-tables-to-jsonschema.git"
   },
   "keywords": [
     "json-schema",
