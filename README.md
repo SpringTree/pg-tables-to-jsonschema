@@ -41,7 +41,7 @@ Usage: cli [options]
 You can use the schema converter module as follows:
 
 ```javascript
-var converter = require( "pg-tables-jsonschema" );
+var converter = require( "pg-tables-to-jsonschema" );
 
 converter( {
     "pgHost":     "localhost"
