@@ -4,12 +4,14 @@
 var path = require( 'path' );
 global.appRoot = path.resolve( __dirname );
 
+var pkg = require( path.join( global.appRoot, '../package.json' ) );
+
 // Collect command-line options and arguments
 //
 var program = require( 'commander' );
 
 program
-  .version( '0.0.1' )
+  .version( pkg.version )
   .usage( '[options]' )
   .option( '--pg-host <value>',           'The postgresql host to connect to' )
   .option( '--pg-port <n>',               'The postgresql host to connect to. Defaults to 5432' )
