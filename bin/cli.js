@@ -22,7 +22,7 @@ program
   .option( '-i, --indent [size]',         'The indent size in spaces. Default: 2' )
   .option( '-o, --out [file]',            'Output folder. Default output is to STDOUT' )
   .option( '-b, --base-url [url]',        'The optional base url for the schema id' )
-  .option( '-p, --additional-properties', 'Allow additonal properties on final schema. Set option to allow properties. Default: false' )
+  .option( '-p, --additional-properties', 'Allow additional properties on final schema. Set option to allow properties. Default: false' )
 
   .parse( process.argv );
 
