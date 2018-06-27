@@ -1,12 +1,12 @@
-# pg-tables-jsonschema
+# pg-tables-to-jsonschema
 
-[![NPM version](https://badge.fury.io/js/pg-tables-jsonschema.png)](http://badge.fury.io/js/pg-tables-jsonschema)
+[![NPM version](https://badge.fury.io/js/pg-tables-to-jsonschema.png)](http://badge.fury.io/js/pg-tables-to-jsonschema)
 
-[![Npm Downloads](https://nodei.co/npm/pg-tables-jsonschema.png?downloads=true&stars=true)](https://nodei.co/npm/pg-tables-jsonschema.png?downloads=true&stars=true)
+[![Npm Downloads](https://nodei.co/npm/pg-tables-to-jsonschema.png?downloads=true&stars=true)](https://nodei.co/npm/pg-tables-to-jsonschema.png?downloads=true&stars=true)
 
 A command-line utility and module to turn postgresql tables into JSON Schemas. Uses [pg-json-schema-export](https://www.npmjs.com/package/pg-json-schema-export) for the table to json conversion.
 
-I wrote this module because I have a set of REST based backends using JSON Schema for their input and output validation. The tables provide the low level data interchange formats I use throughtout my code. So pairing this my other [jsonschema-to-typings](https://www.npmjs.com/package/jsonschema-to-typings) utility gives me both code completion and hinting alongside jsonschema based validation.
+I wrote this module because I have a set of REST based backends using JSON Schema for their input and output validation. The tables provide the low level data interchange formats I use throughtout my code. So pairing this with my other [jsonschema-to-typings](https://www.npmjs.com/package/jsonschema-to-typings) utility gives me both code completion and hinting alongside jsonschema based validation.
 
 DISCLAIMER: I wrote this module to fit my specific project needs. I may have missed a few column types. Also complex types like arrays and geospatial data have not been added. Feel free to fork or add pull requests for anything you are missing
 
