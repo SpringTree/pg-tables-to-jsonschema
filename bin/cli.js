@@ -13,16 +13,19 @@ var program = require( 'commander' );
 program
   .version( pkg.version )
   .usage( '[options]' )
-  .option( '--pg-host <value>',           'The postgresql host to connect to' )
-  .option( '--pg-port <n>',               'The postgresql host to connect to. Defaults to 5432' )
-  .option( '--pg-database <value>',       'The postgresql database to connect to' )
-  .option( '--pg-user <value>',           'The postgresql user to login with' )
-  .option( '--pg-password <value>',       'The postgresql password to login with' )
-  .option( '--pg-schema <value>',         'The postgresql schema to convert' )
-  .option( '-i, --indent [size]',         'The indent size in spaces. Default: 2' )
-  .option( '-o, --out [file]',            'Output folder. Default output is to STDOUT' )
-  .option( '-b, --base-url [url]',        'The optional base url for the schema id' )
-  .option( '-p, --additional-properties', 'Allow additional properties on final schema. Set option to allow properties. Default: false' )
+  .option( '--pg-host <value>',             'The postgresql host to connect to' )
+  .option( '--pg-port <n>',                 'The postgresql host to connect to. Defaults to 5432' )
+  .option( '--pg-database <value>',         'The postgresql database to connect to' )
+  .option( '--pg-user <value>',             'The postgresql user to login with' )
+  .option( '--pg-password <value>',         'The postgresql password to login with' )
+  .option( '--pg-schema <value>',           'The postgresql schema to convert' )
+  .option( '-i, --indent [size]',           'The indent size in spaces. Default: 2' )
+  .option( '-o, --out [file]',              'Output folder. Default output is to STDOUT' )
+  .option( '-b, --base-url [url]',          'The optional base url for the schema id' )
+  .option( '-p, --additional-properties',   'Allow additional properties on final schema. Set option to allow properties. Default: false' )
+  .option( '-t, --include-tables <value>',  'Comma separated list of tables to process. Default is all tables found' )
+  .option( '-e, --exclude-tables <value>',  'Comma separated list of tables to exclude. Default is to not exclude any' )
+  .option( '-u, --unwrap',                  'Unwraps the schema if only 1 is returned' )
 
   .parse( process.argv );
 
@@ -71,6 +74,11 @@ converter( program )
   }
   else
   {
+    // If there is only 1 table result unwrap the array
+    //
+    if ( schemas.length === 1 && program.unwrap ) {
+      schemas = schemas[ 0 ];
+    }
     console.log( JSON.stringify( schemas, null, _.padStart( '', program.indent, ' ' ) ) );
     process.exit();
   }
