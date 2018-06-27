@@ -56,7 +56,7 @@ converter( program )
   //
   if ( program.out )
   {
-    console.log( 'Writing schema files...' );
+    console.warn( 'Writing schema files...' );
     _.each( schemas, function( schema, index )
     {
       // Since json schema v6 .id is replaced by .$id
@@ -65,9 +65,8 @@ converter( program )
 
       let filename = path.join( program.out, _.last( schemaId.split( '/' ) ) );
       fs.writeFileSync( filename, JSON.stringify( schema, null, _.padStart( '', program.indent, ' ' ) ) )
-      console.log( 'File created: ' + filename );
+      console.warn( 'File created: ' + filename );
     } )
-    console.log( 'All done' );
     process.exit();
   }
   else
