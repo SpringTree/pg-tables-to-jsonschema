@@ -18,22 +18,26 @@ pgtables2jsonschema --pg-host localhost --pg-user admin --pg-password secret --p
 
 Calling with -h will provide you with all the possible options:
 
-```javascript
+```bash
 Usage: cli [options]
 
   Options:
 
-    -V, --version          output the version number
-    --pg-host <value>      The postgresql host to connect to
-    --pg-port <n>          The postgresql host to connect to. Defaults to 5432
-    --pg-database <value>  The postgresql database to connect to
-    --pg-user <value>      The postgresql user to login with
-    --pg-password <value>  The postgresql password to login with
-    --pg-schema <value>    The postgresql schema to convert
-    -i, --indent [size]    The indent size in spaces. Default: 2
-    -o, --out [file]       Output folder. Default output is to STDOUT
-    -b, --base-url [url]   The optional base url for the schema id
-    -h, --help             output usage information
+    -V, --version                 output the version number
+    --pg-host <value>             The postgresql host to connect to
+    --pg-port <n>                 The postgresql host to connect to. Defaults to 5432
+    --pg-database <value>         The postgresql database to connect to
+    --pg-user <value>             The postgresql user to login with
+    --pg-password <value>         The postgresql password to login with
+    --pg-schema <value>           The postgresql schema to convert
+    -i, --indent [size]           The indent size in spaces. Default: 2
+    -o, --out [file]              Output folder. Default output is to STDOUT
+    -b, --base-url [url]          The optional base url for the schema id
+    -p, --additional-properties   Allow additional properties on final schema. Set option to allow properties. Default: false
+    -t, --include-tables <value>  Comma separated list of tables to process. Default is all tables found
+    -e, --exclude-tables <value>  Comma separated list of tables to exclude. Default is to not exclude any
+    -u, --unwrap                  Unwraps the schema if only 1 is returned
+    -h, --help                    output usage information
 ```
 
 ## Code usage
