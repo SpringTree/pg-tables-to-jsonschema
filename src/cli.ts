@@ -83,7 +83,7 @@ import { IConfiguration } from './config';
 
       if (config.output?.unwrap && schemas.length === 1) {
         console.log(schemas[0]);
-      } else {
+      } else if (schemas.length > 0) {
         const indentSpaces = commander.indent === undefined ? 2 : commander.indent;
         console.log(JSON.stringify( schemas, null, padStart( '', indentSpaces, ' ' ) ));
       }
