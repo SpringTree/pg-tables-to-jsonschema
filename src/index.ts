@@ -59,6 +59,7 @@ export class SchemaConverter {
     // Connect to the database using pgStructure
     // Will throw on error
     //
+    console.warn('Connecting to database...')
     const dbSchemas = this.config.input?.schemas || ['public'];
     const db = await pgStructure(
       {

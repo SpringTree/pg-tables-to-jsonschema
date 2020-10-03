@@ -3,6 +3,7 @@ import commander from 'commander';
 import jsonfile from 'jsonfile';
 import { isEmpty, set } from 'lodash';
 import { resolve } from 'path';
+import prompts from 'prompts';
 import { SchemaConverter } from './index';
 import { IConfiguration } from './config';
 
@@ -45,28 +46,38 @@ import { IConfiguration } from './config';
         commander.help();
       }
     }
-    if(commander.pgHost) { set( config, 'pg.host', commander.pgHost ); }
-    if(commander.pgDatabase) { set( config, 'pg.database', commander.pgData ); }
-    if(commander.pgPort) { set( config, 'pg.port', commander.pgPort ); }
-    if(commander.pgUser) { set( config, 'pg.user', commander.pgUser ); }
+    if(commander.pgHost) { set(config, 'pg.host', commander.pgHost); }
+    if(commander.pgDatabase) { set(config, 'pg.database', commander.pgData); }
+    if(commander.pgPort) { set(config, 'pg.port', commander.pgPort); }
+    if(commander.pgUser) { set(config, 'pg.user', commander.pgUser); }
 
-    if(commander.pgSchema) { set( config, 'input.schemas', commander.pgSchema.split(',') ); }
-    if(commander.pgSchema) { set( config, 'input.include', commander.includeTables.split(',') ); }
-    if(commander.pgSchema) { set( config, 'input.exclude', commander.excludeTables.split(',') ); }
+    if(commander.pgSchema) { set(config, 'input.schemas', commander.pgSchema.split(',')); }
+    if(commander.pgSchema) { set(config, 'input.include', commander.includeTables.split(',')); }
+    if(commander.pgSchema) { set(config, 'input.exclude', commander.excludeTables.split(',')); }
 
-    if(commander.out) { set( config, 'output.outDir', commander.out ); }
-    if(commander.out) { set( config, 'output.baseUrl', commander.baseUrl ); }
-    if(commander.indent) { set( config, 'output.indent', commander.indent ); }
-    if(commander.desc) { set( config, 'output.defaultDescription', commander.defaultDescription ); }
-    if(commander.additionalProperties) { set( config, 'output.additionalProperties', true ); }
-    if(commander.unwrap) { set( config, 'output.unwrap', true ); }
+    if(commander.out) { set( config, 'output.outDir', commander.out); }
+    if(commander.out) { set( config, 'output.baseUrl', commander.baseUrl); }
+    if(commander.indent) { set( config, 'output.indent', commander.indent); }
+    if(commander.desc) { set( config, 'output.defaultDescription', commander.defaultDescription); }
+    if(commander.additionalProperties) { set( config, 'output.additionalProperties', true); }
+    if(commander.unwrap) { set( config, 'output.unwrap', true); }
 
     if (isEmpty(config)) {
       commander.help();
     }
 
-    const converter = new SchemaConverter(config);
+    // If no password was supplied prompt for it
+    //
+    if(!config.pg?.password){
+      const response = await prompts({
+        type: 'password',
+        name: 'password',
+        message: 'Password?'
+      });
+      if(response.password) { set(config, 'pg.password', response.password); }
+    }
 
+    const converter = new SchemaConverter(config);
     try {
       const schemas = await converter.convert();
 
