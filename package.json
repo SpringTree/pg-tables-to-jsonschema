@@ -2,12 +2,20 @@
   "name": "pg-tables-to-jsonschema",
   "version": "0.2.3",
   "description": "A command-line utility and module to turn postgres tables into JSON Schemas",
-  "main": "./lib/index.js",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "bin": {
-    "pgtables2jsonschema": "./bin/cli.js"
+    "pgtables2jsonschema": "./lib/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:compile": "tsc -b --verbose",
+    "build": "npm-run-all build:compile",
+    "clean": "rimraf lib",
+    "lint": "eslint .",
+    "rebuild": "npm-run-all clean build:compile",
+    "test:jest": "jest --silent --coverage test/",
+    "test": "npm-run-all build test:jest",
+    "watch": "tsc -b src/ --watch"
   },
   "repository": {
     "type": "git",
@@ -30,14 +38,28 @@
   },
   "homepage": "https://github.com/SpringTree/pg-tables-to-jsonschema#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-es2015": "^6.24.1"
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@types/json-schema": "^7.0.6",
+    "@types/jsonfile": "^6.0.0",
+    "@types/lodash": "^4.14.161",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "eslint": "^7.10.0",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "lint-staged": "^10.4.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.4.1",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
   },
   "dependencies": {
-    "commander": "^3.0.1",
-    "jsonfile": "^5.0.0",
-    "lodash": "^4.17.15",
-    "pg-json-schema-export": "^0.13.7"
+    "cli-progress": "^3.8.2",
+    "commander": "^6.1.0",
+    "jsonfile": "^6.0.1",
+    "lodash": "^4.17.20",
+    "pg-structure": "^7.2.3"
   }
 }
