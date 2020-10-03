@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import commander from 'commander';
 import jsonfile from 'jsonfile';
-import { set } from 'lodash';
+import { isEmpty, set } from 'lodash';
 import { resolve } from 'path';
 import { SchemaConverter } from './index';
 import { IConfiguration } from './config';
@@ -60,6 +60,10 @@ import { IConfiguration } from './config';
     if(commander.desc) { set( config, 'output.defaultDescription', commander.defaultDescription ); }
     if(commander.additionalProperties) { set( config, 'output.additionalProperties', true ); }
     if(commander.unwrap) { set( config, 'output.unwrap', true ); }
+
+    if (isEmpty(config)) {
+      commander.help();
+    }
 
     const converter = new SchemaConverter(config);
 
