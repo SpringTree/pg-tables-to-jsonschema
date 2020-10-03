@@ -1,6 +1,6 @@
 import { promises, constants } from 'fs';
 import { join } from 'path';
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import jsonfile from 'jsonfile';
 import pgStructure, { Entity, Schema } from 'pg-structure';
 import { IConfiguration } from './config';
@@ -25,7 +25,7 @@ export class SchemaConverter {
       throw new Error('No configuration supplied');
     }
 
-    if ( !this.config.pg.host || !this.config.pg.database || !this.config.pg.user ) {
+    if ( !this.config.pg?.host || !this.config.pg?.database || !this.config.pg?.user ) {
       throw new Error( 'Missing PGSQL config' );
     }
 
@@ -51,7 +51,7 @@ export class SchemaConverter {
    *
    * @returns {(Promise<JSONSchema7[]>)}
    */
-  public async convert(): Promise<JSONSchema7[]|undefined> {
+  public async convert(): Promise<JSONSchema7[]> {
     // Ensure configuration is sane first
     //
     await this.checkConfiguration();
@@ -59,7 +59,7 @@ export class SchemaConverter {
     // Connect to the database using pgStructure
     // Will throw on error
     //
-    const dbSchemas = this.config.input.schemas || ['public'];
+    const dbSchemas = this.config.input?.schemas || ['public'];
     const db = await pgStructure(
       {
         database: this.config.pg.database,
@@ -81,7 +81,7 @@ export class SchemaConverter {
 
     // Prepare some output settings
     //
-    const outputFolder = this.config.output.outDir;
+    const outputFolder = this.config.output?.outDir;
     const indentSpaces = this.config.output?.indentSpaces === undefined ? 2 : this.config.output.indentSpaces;
     const defaultDescription = this.config.output?.defaultDescription || `${new Date()}`;
     const additionalProperties = this.config.output?.additionalProperties === true;
@@ -240,7 +240,7 @@ export class SchemaConverter {
 
       // TODO: Determine the column type and format
       //
-      jsonSchema.properties[columnName] = {
+      (jsonSchema.properties as {[key: string]: JSONSchema7Definition})[columnName] = {
         type: 'string',
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
         maxLength: column.length,
@@ -249,7 +249,7 @@ export class SchemaConverter {
       // Check if the column is required
       //
       if (column.notNull && !column.default) {
-        jsonSchema.required.push(columnName);
+        (jsonSchema.required as string[]).push(columnName);
       }
     }
 

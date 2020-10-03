@@ -2,14 +2,15 @@
 import commander from 'commander';
 import jsonfile from 'jsonfile';
 import { set } from 'lodash';
+import { resolve } from 'path';
 import { SchemaConverter } from './index';
-
-import * as pkg from '../package.json';
 import { IConfiguration } from './config';
 
 // Global self executing function for async/await
 //
 (async () => {
+  const pkg = await jsonfile.readFile(resolve(__dirname, '../package.json'));
+
   // Collect command-line options and arguments
   //
   commander
@@ -35,13 +36,7 @@ import { IConfiguration } from './config';
 
     // Build the configuration either from provided file or command line arguments
     //
-    let config: IConfiguration = {
-      pg: {
-        host: 'localhost',
-        database: 'postgres',
-        user: 'postgres',
-      }
-    };
+    let config = {} as IConfiguration;
     if (commander.config) {
       try {
         config = await jsonfile.readFile(commander.config);
@@ -77,7 +72,7 @@ import { IConfiguration } from './config';
     try {
       const schemas = await converter.convert();
 
-      if (config.output.unwrap && schemas.length === 1) {
+      if (config.output?.unwrap && schemas.length === 1) {
         console.log(schemas[0]);
       } else {
         console.log(schemas);
