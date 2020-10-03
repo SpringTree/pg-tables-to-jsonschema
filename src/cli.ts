@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import commander from 'commander';
 import jsonfile from 'jsonfile';
-import { isEmpty, set } from 'lodash';
+import { isEmpty, padStart, set } from 'lodash';
 import { resolve } from 'path';
 import prompts from 'prompts';
 import { SchemaConverter } from './index';
@@ -84,7 +84,8 @@ import { IConfiguration } from './config';
       if (config.output?.unwrap && schemas.length === 1) {
         console.log(schemas[0]);
       } else {
-        console.log(schemas);
+        const indentSpaces = commander.indent === undefined ? 2 : commander.indent;
+        console.log(JSON.stringify( schemas, null, padStart( '', indentSpaces, ' ' ) ));
       }
     } catch(err) {
       console.error(err);
