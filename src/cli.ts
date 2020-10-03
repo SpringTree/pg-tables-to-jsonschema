@@ -62,12 +62,6 @@ import { IConfiguration } from './config';
     if(commander.unwrap) { set( config, 'output.unwrap', true ); }
 
     const converter = new SchemaConverter(config);
-    try {
-      converter.checkConfiguration();
-    } catch(err) {
-      console.error(err);
-      commander.help();
-    }
 
     try {
       const schemas = await converter.convert();
@@ -79,6 +73,7 @@ import { IConfiguration } from './config';
       }
     } catch(err) {
       console.error(err);
+      console.error('Suggestion: Run with --help for parameters or check supplied configuration file')
       process.exit(-1);
     }
 })();
