@@ -237,11 +237,93 @@ export class SchemaConverter {
       const columnName = column.name;
 
       const columnType = column.type.name;
+      let jsonType: JSONSchema7['type'] = 'string';
+      let jsonFormat: string|undefined = undefined;
 
-      // TODO: Determine the column type and format
-      //
+      switch(columnType) {
+        case 'text':
+        case '"char"':
+        case 'uuid':
+        case 'character varying':
+        {
+          jsonType = 'string';
+        } break;
+
+        case 'date':
+        {
+          jsonType = 'string';
+          jsonFormat = 'date';
+        } break;
+
+        case 'timestamp with time zone':
+        case 'timestamp without time zone':
+        case 'timestamp':
+        {
+          jsonType = 'string';
+          jsonFormat = 'date-time';
+        } break;
+
+        case 'boolean':
+        {
+          jsonType = 'boolean';
+        } break;
+
+        case 'real':
+        case 'float8':
+        case 'int':
+        case 'smallint':
+        case 'bigint':
+        case 'integer':
+        case 'double precision':
+        case 'numeric':
+        {
+          jsonType = 'number';
+        } break;
+
+        case 'json':
+        case 'jsonb':
+        {
+          jsonType = 'object';
+        } break;
+
+        // case 'interval':
+        // {
+        //   schemaProperty = {
+        //     oneOf: [
+        //       {
+        //         type:         'number',
+        //         description:  'Duration in seconds'
+        //       },
+        //       {
+        //         type:         'string',
+        //         description:  'Descriptive duration i.e. 8 hours'
+        //       },
+        //       {
+        //         type:         'object',
+        //         description:  'Duration object',
+        //         properties: {
+        //           years:        { type: 'number' },
+        //           months:       { type: 'number' },
+        //           days:         { type: 'number' },
+        //           hours:        { type: 'number' },
+        //           minutes:      { type: 'number' },
+        //           seconds:      { type: 'number' },
+        //           milliseconds: { type: 'number' }
+        //         }
+        //       },
+        //     ]
+        //   }
+        // } break;
+
+        default:
+        {
+          console.warn(`Unsupported column type: ${columnType}. Defaulting to string` );
+        } break;
+      }
+
       (jsonSchema.properties as {[key: string]: JSONSchema7Definition})[columnName] = {
-        type: 'string',
+        type: jsonType,
+        format: jsonFormat,
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
         maxLength: column.length,
       };
