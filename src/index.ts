@@ -59,7 +59,7 @@ export class SchemaConverter {
     // Connect to the database using pgStructure
     // Will throw on error
     //
-    console.warn('Connecting to database...')
+    console.warn('Connecting to database...');
     const dbSchemas = this.config.input?.schemas || ['public'];
     const db = await pgStructure(
       {
@@ -71,6 +71,7 @@ export class SchemaConverter {
       },
       {
         includeSchemas: dbSchemas,
+        includeSystemSchemas: true,
       },
     )
 
@@ -78,7 +79,6 @@ export class SchemaConverter {
     //
     const includedEntities = this.config.input?.include || [];
     const excludedEntities = this.config.input?.exclude || [];
-    const filterEntities = includedEntities.length > 0 || excludedEntities.length > 0;
 
     // Prepare some output settings
     //
@@ -93,57 +93,57 @@ export class SchemaConverter {
     // Iterate all the schemas
     //
     for (const dbSchema of dbSchemas) {
+      console.warn(`Processing schema ${dbSchema}`);
       const schema = db.get(dbSchema) as Schema;
 
       // Process all the tables in the schema
       //
-      for (const tableName in schema.tables) {
-        const entity = db.get(tableName) as Entity;
+      for (const table of schema.tables) {
+        const tableName = table.name;
 
         // Check if the table is filtered
-        // First check if any filter is set for performance reasons
         // A table needs to be processed if it is included or not excluded
         // We check exclusion first as a priority
         //
-        if (
-          filterEntities &&
-          ( excludedEntities.indexOf(tableName) === -1 || includedEntities.indexOf(tableName) !== -1  )
-        ) {
+        if (excludedEntities.indexOf(tableName) === -1 || includedEntities.indexOf(tableName) !== -1)
+        {
+          console.warn(`Processing table ${tableName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
             baseUrl,
             defaultDescription,
             indentSpaces,
             outputFolder,
-            entity,
+            entity: table,
           });
           if (!outputFolder) {
             outputSchemas.push(jsonSchema);
           }
+        } else {
+          console.warn(`Skipping excluded table ${tableName}`);
         }
       }
 
       // Process all the views in the schema
       //
-      for ( const viewName in schema.views ) {
-        const entity = db.get(viewName) as Entity;
+      for ( const view of schema.views ) {
+        const viewName = view.name
 
         // Check if the table is filtered
         // First check if any filter is set for performance reasons
         // A table needs to be processed if it is included or not excluded
         // We check exclusion first as a priority
         //
-        if (
-          filterEntities &&
-          ( excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1  )
-        ) {
+        if (excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1)
+        {
+          console.warn(`Processing view ${viewName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
             baseUrl,
             defaultDescription,
             indentSpaces,
             outputFolder,
-            entity,
+            entity: view,
           });
           if (!outputFolder) {
             outputSchemas.push(jsonSchema);
@@ -153,25 +153,24 @@ export class SchemaConverter {
 
       // Process all the materialized views in the schema
       //
-      for ( const viewName in schema.materializedViews ) {
-        const entity = db.get(viewName) as Entity;
+      for ( const view of schema.materializedViews ) {
+        const viewName = view.name
 
         // Check if the table is filtered
         // First check if any filter is set for performance reasons
         // A table needs to be processed if it is included or not excluded
         // We check exclusion first as a priority
         //
-        if (
-          filterEntities &&
-          ( excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1  )
-        ) {
+        if (excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1)
+        {
+          console.warn(`Processing materialized view ${viewName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
             baseUrl,
             defaultDescription,
             indentSpaces,
             outputFolder,
-            entity,
+            entity: view,
           });
           if (!outputFolder) {
             outputSchemas.push(jsonSchema);
