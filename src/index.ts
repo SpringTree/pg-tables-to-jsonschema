@@ -282,11 +282,14 @@ export class SchemaConverter {
     const columnType = column.type.name;
 
     switch(columnType) {
-      case 'text':
-      case 'char':
+      case 'bit':
+      case 'bit varying':
+      case 'varbit':
+      case 'character':
       case 'character varying':
+      case 'text':
       {
-        return { type: 'string' };
+        return { type: 'string', maxLength: column.length };
       }
 
       case 'uuid':
@@ -297,6 +300,12 @@ export class SchemaConverter {
       case 'date':
       {
         return { type: 'string', format: 'date' };
+      }
+
+      case 'time with time zone':
+      case 'time without time zone':
+      {
+        return { type: 'string', format: 'time' };
       }
 
       case 'timestamp with time zone':
@@ -311,14 +320,15 @@ export class SchemaConverter {
         return { type: 'boolean' };
       }
 
-      case 'real':
+      case 'bigint':
+      case 'decimal':
+      case 'double precision':
       case 'float8':
       case 'int':
-      case 'smallint':
-      case 'bigint':
       case 'integer':
-      case 'double precision':
       case 'numeric':
+      case 'real':
+      case 'smallint':
       {
         return { type: 'number' };
       }
