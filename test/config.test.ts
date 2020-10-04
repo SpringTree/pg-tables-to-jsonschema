@@ -1,7 +1,7 @@
 import { IConfiguration } from '../src/config';
 import { SchemaConverter } from '../src/index';
 
-const exampleConfig = {
+const exampleConfig: IConfiguration = {
   "pg": {
     "host": "localhost",
     "database": "mydb",
