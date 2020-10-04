@@ -235,10 +235,10 @@ export class SchemaConverter {
     const columns = entity.columns;
     for (const column of columns) {
       const columnName = column.name;
-      const columnType = this.convertColumnType({ column });
+      const columnType = column.type.name;
 
       (jsonSchema.properties as {[key: string]: JSONSchema7Definition})[columnName] = {
-        ...columnType as Record<string, unknown>,
+        ...this.convertColumnType({ column }) as Record<string, unknown>,
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
         maxLength: column.length,
       };
