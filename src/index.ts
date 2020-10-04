@@ -101,12 +101,12 @@ export class SchemaConverter {
       for (const table of schema.tables) {
         const tableName = table.name;
 
-        // Check if the table is filtered
-        // A table needs to be processed if it is included or not excluded
-        // We check exclusion first as a priority
+        // Check if the entity is included and/or excluded
         //
-        if (excludedEntities.indexOf(tableName) === -1 || includedEntities.indexOf(tableName) !== -1)
-        {
+        if (
+          excludedEntities.indexOf(tableName) === -1 &&
+          (includedEntities.length === 0 || includedEntities.indexOf(tableName) !== -1)
+        ) {
           console.warn(`Processing table ${tableName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
@@ -129,13 +129,12 @@ export class SchemaConverter {
       for (const view of schema.views) {
         const viewName = view.name
 
-        // Check if the table is filtered
-        // First check if any filter is set for performance reasons
-        // A table needs to be processed if it is included or not excluded
-        // We check exclusion first as a priority
+        // Check if the entity is included and/or excluded
         //
-        if (excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1)
-        {
+        if (
+          excludedEntities.indexOf(viewName) === -1 &&
+          (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
+        ) {
           console.warn(`Processing view ${viewName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
@@ -156,13 +155,12 @@ export class SchemaConverter {
       for (const view of schema.materializedViews) {
         const viewName = view.name
 
-        // Check if the table is filtered
-        // First check if any filter is set for performance reasons
-        // A table needs to be processed if it is included or not excluded
-        // We check exclusion first as a priority
+        // Check if the entity is included and/or excluded
         //
-        if (excludedEntities.indexOf(viewName) === -1 || includedEntities.indexOf(viewName) !== -1)
-        {
+        if (
+          excludedEntities.indexOf(viewName) === -1 &&
+          (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
+        ) {
           console.warn(`Processing materialized view ${viewName}`);
           const jsonSchema = await this.convertEntity( {
             additionalProperties,
