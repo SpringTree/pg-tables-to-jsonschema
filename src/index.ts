@@ -278,6 +278,7 @@ export class SchemaConverter {
     }
   ) : JSONSchema7Definition {
     const columnType = column.type.name;
+    const isArray = column.arrayDimension > 0;
 
     switch(columnType) {
       case 'bit':
@@ -287,35 +288,59 @@ export class SchemaConverter {
       case 'character varying':
       case 'text':
       {
-        return { type: 'string', maxLength: column.length };
+        const typeDef: JSONSchema7Definition = { type: 'string', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'uuid':
       {
-        return { type: 'string', format: 'uuid' };
+        const typeDef: JSONSchema7Definition = { type: 'string', format: 'uuid', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'date':
       {
-        return { type: 'string', format: 'date' };
+        const typeDef: JSONSchema7Definition = { type: 'string', format: 'date', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'time with time zone':
       case 'time without time zone':
       {
-        return { type: 'string', format: 'time' };
+        const typeDef: JSONSchema7Definition = { type: 'string', format: 'time', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'timestamp with time zone':
       case 'timestamp without time zone':
       case 'timestamp':
       {
-        return { type: 'string', format: 'date-time' };
+        const typeDef: JSONSchema7Definition = { type: 'string', format: 'date-time', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'boolean':
       {
-        return { type: 'boolean' };
+        const typeDef: JSONSchema7Definition = { type: 'boolean' };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'bigint':
@@ -328,18 +353,26 @@ export class SchemaConverter {
       case 'real':
       case 'smallint':
       {
-        return { type: 'number' };
+        const typeDef: JSONSchema7Definition = { type: 'number', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'json':
       case 'jsonb':
       {
-        return { type: 'object', properties: {} };
+        const typeDef: JSONSchema7Definition = { type: 'object', properties: {} };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
       }
 
       case 'interval':
       {
-        return {
+        const typeDef: JSONSchema7Definition = {
           oneOf: [
             {
               type:         'number',
@@ -363,7 +396,11 @@ export class SchemaConverter {
               }
             },
           ]
+        };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
         }
+        return typeDef;
       }
 
       default:
