@@ -2,7 +2,7 @@ import { promises, constants } from 'fs';
 import { join } from 'path';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import jsonfile from 'jsonfile';
-import pgStructure, { Entity, Schema } from 'pg-structure';
+import pgStructure, { Column, Entity, Schema } from 'pg-structure';
 import { IConfiguration } from './config';
 
 export class SchemaConverter {
@@ -126,7 +126,7 @@ export class SchemaConverter {
 
       // Process all the views in the schema
       //
-      for ( const view of schema.views ) {
+      for (const view of schema.views) {
         const viewName = view.name
 
         // Check if the table is filtered
@@ -153,7 +153,7 @@ export class SchemaConverter {
 
       // Process all the materialized views in the schema
       //
-      for ( const view of schema.materializedViews ) {
+      for (const view of schema.materializedViews) {
         const viewName = view.name
 
         // Check if the table is filtered
@@ -235,95 +235,10 @@ export class SchemaConverter {
     const columns = entity.columns;
     for (const column of columns) {
       const columnName = column.name;
-
-      const columnType = column.type.name;
-      let jsonType: JSONSchema7['type'] = 'string';
-      let jsonFormat: string|undefined = undefined;
-
-      switch(columnType) {
-        case 'text':
-        case '"char"':
-        case 'uuid':
-        case 'character varying':
-        {
-          jsonType = 'string';
-        } break;
-
-        case 'date':
-        {
-          jsonType = 'string';
-          jsonFormat = 'date';
-        } break;
-
-        case 'timestamp with time zone':
-        case 'timestamp without time zone':
-        case 'timestamp':
-        {
-          jsonType = 'string';
-          jsonFormat = 'date-time';
-        } break;
-
-        case 'boolean':
-        {
-          jsonType = 'boolean';
-        } break;
-
-        case 'real':
-        case 'float8':
-        case 'int':
-        case 'smallint':
-        case 'bigint':
-        case 'integer':
-        case 'double precision':
-        case 'numeric':
-        {
-          jsonType = 'number';
-        } break;
-
-        case 'json':
-        case 'jsonb':
-        {
-          jsonType = 'object';
-        } break;
-
-        // case 'interval':
-        // {
-        //   schemaProperty = {
-        //     oneOf: [
-        //       {
-        //         type:         'number',
-        //         description:  'Duration in seconds'
-        //       },
-        //       {
-        //         type:         'string',
-        //         description:  'Descriptive duration i.e. 8 hours'
-        //       },
-        //       {
-        //         type:         'object',
-        //         description:  'Duration object',
-        //         properties: {
-        //           years:        { type: 'number' },
-        //           months:       { type: 'number' },
-        //           days:         { type: 'number' },
-        //           hours:        { type: 'number' },
-        //           minutes:      { type: 'number' },
-        //           seconds:      { type: 'number' },
-        //           milliseconds: { type: 'number' }
-        //         }
-        //       },
-        //     ]
-        //   }
-        // } break;
-
-        default:
-        {
-          console.warn(`Unsupported column type: ${columnType}. Defaulting to string` );
-        } break;
-      }
+      const columnType = this.convertColumnType({ column });
 
       (jsonSchema.properties as {[key: string]: JSONSchema7Definition})[columnName] = {
-        type: jsonType,
-        format: jsonFormat,
+        ...columnType as Record<string, unknown>,
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
         maxLength: column.length,
       };
@@ -343,5 +258,111 @@ export class SchemaConverter {
     }
 
     return jsonSchema;
+  }
+
+  /**
+   * Helper method to convert a postgresql column type to a json-schema type
+   * and format
+   *
+   * @private
+   * @param {{
+   *       column: Column,
+   *     }} {
+   *       column,
+   *     }
+   * @returns {Partial<JSONSchema7Definition>}
+   */
+  private convertColumnType(
+    {
+      column,
+    } : {
+      column: Column,
+    }
+  ) : JSONSchema7Definition {
+    const columnType = column.type.name;
+
+    switch(columnType) {
+      case 'text':
+      case 'char':
+      case 'character varying':
+      {
+        return { type: 'string' };
+      }
+
+      case 'uuid':
+      {
+        return { type: 'string', format: 'uuid' };
+      }
+
+      case 'date':
+      {
+        return { type: 'string', format: 'date' };
+      }
+
+      case 'timestamp with time zone':
+      case 'timestamp without time zone':
+      case 'timestamp':
+      {
+        return { type: 'string', format: 'date-time' };
+      }
+
+      case 'boolean':
+      {
+        return { type: 'boolean' };
+      }
+
+      case 'real':
+      case 'float8':
+      case 'int':
+      case 'smallint':
+      case 'bigint':
+      case 'integer':
+      case 'double precision':
+      case 'numeric':
+      {
+        return { type: 'number' };
+      }
+
+      case 'json':
+      case 'jsonb':
+      {
+        return { type: 'object', properties: {} };
+      }
+
+      case 'interval':
+      {
+        return {
+          oneOf: [
+            {
+              type:         'number',
+              description:  'Duration in seconds'
+            },
+            {
+              type:         'string',
+              description:  'Descriptive duration i.e. 8 hours'
+            },
+            {
+              type:         'object',
+              description:  'Duration object',
+              properties: {
+                years:        { type: 'number' },
+                months:       { type: 'number' },
+                days:         { type: 'number' },
+                hours:        { type: 'number' },
+                minutes:      { type: 'number' },
+                seconds:      { type: 'number' },
+                milliseconds: { type: 'number' }
+              }
+            },
+          ]
+        }
+      }
+
+      default:
+      {
+        console.warn(`Unsupported column type: ${columnType}. Defaulting to null` );
+        return { type: 'null' };
+      }
+    }
   }
 }
