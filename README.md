@@ -24,6 +24,7 @@ Usage: cli [options]
   Options:
 
     -V, --version                 output the version number
+    -c, --config                  Path to configuration file. Additional parameters override config values
     --pg-host <value>             The postgresql host to connect to
     --pg-port <n>                 The postgresql host to connect to. Defaults to 5432
     --pg-database <value>         The postgresql database to connect to
@@ -40,6 +41,8 @@ Usage: cli [options]
     -h, --help                    output usage information
 ```
 
+You can find an [example configuration](example-config.json) in this repository.
+
 ## Code usage
 
 You can use the schema converter module as follows:
@@ -47,25 +50,28 @@ You can use the schema converter module as follows:
 ```javascript
 var converter = require( "pg-tables-to-jsonschema" );
 
-converter( {
-    "pgHost":     "localhost"
-,   "pgPort":     5432
-,   "pgUser":     "admin"
-,   "pgPassword": "secret"
-,   "pgDatabase": "my_database"
-,   "pgSchema":   "my_schema"
-,   "baseUrl":    "http://yourhost/schema/"
-,   "indent":     2
-} )
-.then( function( schemas )
-{
-  // Schema's is an array of json-schema objects
-  //
-  console.log( JSON.stringify( schemas, null, '  ' ) )
-} )
-.catch( function( error )
-{
-  console.error( 'Conversion failed', error );
+// Schemas is an array of json-schema objects
+//
+const schemas = await converter( {
+  pg: {
+    host: 'localhost',
+    port: 5432,
+    user: 'admin',
+    password: 'secret'
+    database: 'db_name',
+  },
+  input: {
+    schemas: ['public', 'stuff'],
+    exclude: ['not_this_table'],
+    include: []
+  },
+  output: {
+    additionalProperties: false,
+    baseUrl: 'http://api.localhost.com/schema/',
+    defaultDescription: 'Missing description',
+    indentSpaces: 2,
+    outDir: 'dist/schema',
+    unwrap: false
+  }
 } );
-
 ```
