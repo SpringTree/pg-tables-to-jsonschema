@@ -11,3 +11,7 @@ coverage
 # Ignore TS output
 lib
 tsconfig.tsbuildinfo
+
+# Some test files I use
+/*-config.json
+test/dump
