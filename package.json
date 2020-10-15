@@ -60,7 +60,7 @@
     "commander": "^6.1.0",
     "jsonfile": "^6.0.1",
     "lodash": "^4.17.20",
-    "pg-structure": "7.2.1",
+    "pg-structure": "github:Qwerios/pg-structure#feature/pg9-regexp-and-view-array",
     "prompts": "^2.3.2"
   }
 }
