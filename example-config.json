@@ -1,0 +1,21 @@
+{
+  "pg": {
+    "host": "localhost",
+    "database": "mydb",
+    "user": "postgres",
+    "password": "secret"
+  },
+  "input": {
+    "schemas": ["public", "stuff"],
+    "exclude": ["not_this_table"],
+    "include": []
+  },
+  "output": {
+    "additionalProperties": false,
+    "baseUrl": "http://api.localhost.com/schema/",
+    "defaultDescription": "Missing description",
+    "indentSpaces": 2,
+    "outDir": "",
+    "unwrap": false
+  }
+}

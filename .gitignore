@@ -1,3 +1,17 @@
-npm-debug.log
 node_modules
-test/
+.DS_Store
+*.log
+.vscode
+.idea
+.eslintcache
+
+# Test coverage
+coverage
+
+# Ignore TS output
+lib
+tsconfig.tsbuildinfo
+
+# Some test files I use
+/*-config.json
+test/dump

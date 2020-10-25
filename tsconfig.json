@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "es5"
+    ],
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "composite": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "outDir": "lib",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/*.ts",
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "test"
+  ]
+}
