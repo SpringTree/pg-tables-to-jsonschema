@@ -10,6 +10,8 @@ I wrote this module because I have a set of REST-like APIs using JSON Schema for
 
 DISCLAIMER: I wrote this module to fit my specific project needs. I may have missed a few column types. Also complex types like arrays and geo-spatial data have not been added. Feel free to fork or add pull requests for anything you are missing
 
+UPDATE: I've now released version 1.0.0 which doesn't break previous APIs and features but is a pretty big refactor. Switched to pg-structure and typescript and now supporting config based conversion.
+
 ## Command-line usage
 
 ```javascript
