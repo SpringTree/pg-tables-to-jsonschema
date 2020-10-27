@@ -25,7 +25,7 @@ import { IConfiguration } from './config';
     .option( '--pg-password <value>',         'The postgresql password to login with' )
     .option( '--pg-schema <value>',           'The postgresql schema to convert' )
     .option( '-i, --indent [size]',           'The indent size in spaces. Default: 2' )
-    .option( '-o, --out [file]',              'Output folder. Default output is to STDOUT' )
+    .option( '-o, --out [file]',              'Output folder. Default output is to STDOUT. A sub-folder will be created per schema' )
     .option( '-b, --base-url [url]',          'The optional base url for the schema id' )
     .option( '-p, --additional-properties',   'Allow additional properties on final schema. Set option to allow properties. Default: false' )
     .option( '-t, --include-tables <value>',  'Comma separated list of tables to process. Default is all tables found' )
