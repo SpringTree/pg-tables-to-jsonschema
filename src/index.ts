@@ -2,6 +2,7 @@ import { promises, constants } from 'fs';
 import { join } from 'path';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import jsonfile from 'jsonfile';
+import mkdirp from 'mkdirp';
 import pgStructure, { Column, Entity, Schema } from 'pg-structure';
 import { IConfiguration } from './config';
 
@@ -30,6 +31,10 @@ export class SchemaConverter {
     }
 
     if ( this.config.output?.outDir ) {
+      // Create the folder and sub-paths if missing
+      //
+      await mkdirp( this.config.output.outDir );
+
       // Check the output folder is writeable
       //
       try {
@@ -95,6 +100,7 @@ export class SchemaConverter {
     for (const dbSchema of dbSchemas) {
       console.warn(`Processing schema ${dbSchema}`);
       const schema = db.get(dbSchema) as Schema;
+      const schemaName = schema.name;
 
       // Process all the tables in the schema
       //
@@ -114,6 +120,7 @@ export class SchemaConverter {
             defaultDescription,
             indentSpaces,
             outputFolder,
+            schemaName,
             entity: table,
           });
           if (!outputFolder) {
@@ -142,6 +149,7 @@ export class SchemaConverter {
             defaultDescription,
             indentSpaces,
             outputFolder,
+            schemaName,
             entity: view,
           });
           if (!outputFolder) {
@@ -168,6 +176,7 @@ export class SchemaConverter {
             defaultDescription,
             indentSpaces,
             outputFolder,
+            schemaName,
             entity: view,
           });
           if (!outputFolder) {
@@ -208,6 +217,7 @@ export class SchemaConverter {
       defaultDescription,
       indentSpaces,
       outputFolder,
+      schemaName,
       entity,
     }: {
       additionalProperties: boolean,
@@ -215,6 +225,7 @@ export class SchemaConverter {
       defaultDescription: string,
       indentSpaces: number,
       outputFolder?: string,
+      schemaName: string,
       entity: Entity,
     }
   ) {
@@ -251,7 +262,9 @@ export class SchemaConverter {
     // Write to file if requested
     //
     if (outputFolder) {
-      const fileName = join(outputFolder, `${entityName}.json`);
+      const folderName = join(outputFolder, schemaName);
+      await mkdirp(folderName);
+      const fileName = join(folderName, `${entityName}.json`);
       await jsonfile.writeFile(fileName, jsonSchema, { spaces: indentSpaces });
     }
 

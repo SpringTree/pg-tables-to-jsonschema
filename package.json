@@ -43,6 +43,7 @@
     "@types/json-schema": "^7.0.6",
     "@types/jsonfile": "^6.0.0",
     "@types/lodash": "^4.14.162",
+    "@types/mkdirp": "^1.0.1",
     "@types/prompts": "^2.0.9",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -60,6 +61,7 @@
     "commander": "^6.2.0",
     "jsonfile": "^6.0.1",
     "lodash": "^4.17.20",
+    "mkdirp": "^1.0.4",
     "pg-structure": "^7.2.6",
     "prompts": "^2.3.2"
   }
