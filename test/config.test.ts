@@ -59,21 +59,21 @@ describe('Config', () => {
     }
   });
 
-  test('Not writeable output folder', async () => {
-    const config: IConfiguration = JSON.parse(JSON.stringify(exampleConfig));
-    if (!config.output) {
-      config.output = {};
-    }
-    config.output.outDir = './totally-not-a-folder';
+  // test('Not writeable output folder', async () => {
+  //   const config: IConfiguration = JSON.parse(JSON.stringify(exampleConfig));
+  //   if (!config.output) {
+  //     config.output = {};
+  //   }
+  //   config.output.outDir = './totally-not-a-folder';
 
-    const converter = new SchemaConverter(config);
-    try {
-      await converter.checkConfiguration();
-      throw new Error('Should have thrown error');
-    } catch (err) {
-      expect(err).toBeDefined();
-      expect(err.message).toEqual(`Cannot write to ${config.output.outDir}`);
-    }
-  });
+  //   const converter = new SchemaConverter(config);
+  //   try {
+  //     await converter.checkConfiguration();
+  //     throw new Error('Should have thrown error');
+  //   } catch (err) {
+  //     expect(err).toBeDefined();
+  //     expect(err.message).toEqual(`Cannot write to ${config.output.outDir}`);
+  //   }
+  // });
 });
 

@@ -123,9 +123,8 @@ export class SchemaConverter {
             schemaName,
             entity: table,
           });
-          if (!outputFolder) {
-            outputSchemas.push(jsonSchema);
-          }
+
+          outputSchemas.push(jsonSchema);
         } else {
           console.warn(`Skipping excluded table ${tableName}`);
         }
@@ -152,9 +151,8 @@ export class SchemaConverter {
             schemaName,
             entity: view,
           });
-          if (!outputFolder) {
-            outputSchemas.push(jsonSchema);
-          }
+
+          outputSchemas.push(jsonSchema);
         }
       }
 
@@ -179,9 +177,8 @@ export class SchemaConverter {
             schemaName,
             entity: view,
           });
-          if (!outputFolder) {
-            outputSchemas.push(jsonSchema);
-          }
+
+          outputSchemas.push(jsonSchema);
         }
       }
     }

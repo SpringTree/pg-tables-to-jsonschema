@@ -80,13 +80,17 @@ import { IConfiguration } from './config';
     const converter = new SchemaConverter(config);
     try {
       const schemas = await converter.convert();
+      const outputFolder = config.output?.outDir;
 
-      if (config.output?.unwrap && schemas.length === 1) {
-        console.log(schemas[0]);
-      } else if (schemas.length > 0) {
-        const indentSpaces = commander.indent === undefined ? 2 : commander.indent;
-        console.log(JSON.stringify( schemas, null, padStart( '', indentSpaces, ' ' ) ));
+      if (!outputFolder) {
+        if (config.output?.unwrap && schemas.length === 1) {
+          console.log(schemas[0]);
+        } else if (schemas.length > 0) {
+          const indentSpaces = commander.indent === undefined ? 2 : commander.indent;
+          console.log(JSON.stringify( schemas, null, padStart( '', indentSpaces, ' ' ) ));
+        }
       }
+
     } catch(err) {
       console.error(err);
       console.error('Suggestion: Run with --help for parameters or check supplied configuration file')
