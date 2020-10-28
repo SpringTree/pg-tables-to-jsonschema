@@ -12,6 +12,7 @@
     "build": "npm-run-all build:compile",
     "clean": "rimraf lib",
     "lint": "eslint .",
+    "prepublish": "npm-run-all build:compile",
     "rebuild": "npm-run-all clean build:compile",
     "test:jest": "jest --silent --coverage test/",
     "test": "npm-run-all build test:jest",
