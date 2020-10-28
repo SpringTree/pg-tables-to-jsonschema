@@ -227,11 +227,12 @@ export class SchemaConverter {
     }
   ) {
     const entityName = entity.name;
+    const baseName = entityName.replace( `${schemaName}_`, '' );
     const jsonSchema: JSONSchema7 = {
       additionalProperties,
       $schema: 'http://json-schema.org/draft-07/schema#',
-      $id: `${baseUrl}/${entityName}.json`,
-      title: entityName,
+      $id: `${baseUrl}/${schemaName}/${entityName}.json`,
+      title: baseName,
       description: entity.comment || defaultDescription,
       properties: {},
       required: [],
