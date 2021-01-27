@@ -47,7 +47,8 @@ describe('Config', () => {
 
   test('Missing database details', async () => {
     const config: IConfiguration = JSON.parse(JSON.stringify(exampleConfig));
-    delete config.pg;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (config as any).pg;
 
     const converter = new SchemaConverter(config);
     try {
