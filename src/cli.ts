@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import commander from 'commander';
+import { program } from 'commander';
 import jsonfile from 'jsonfile';
 import { isEmpty, padStart, set } from 'lodash';
 import { resolve } from 'path';
@@ -14,7 +14,7 @@ import { IConfiguration } from './config';
 
   // Collect command-line options and arguments
   //
-  commander
+  program
     .version( pkg.version )
     .usage( '[options]' )
     .option( '-c, --config <value>',          'Path to configuration file. Additional parameters override config values' )
@@ -35,35 +35,37 @@ import { IConfiguration } from './config';
 
     .parse( process.argv );
 
+    const options = program.opts();
+
     // Build the configuration either from provided file or command line arguments
     //
     let config = {} as IConfiguration;
-    if (commander.config) {
+    if (options.config) {
       try {
-        config = await jsonfile.readFile(commander.config);
+        config = await jsonfile.readFile(options.config);
       } catch (err) {
-        console.error(`Failed to read config file ${commander.config}`, err);
-        commander.help();
+        console.error(`Failed to read config file ${options.config}`, err);
+        options.help();
       }
     }
-    if(commander.pgHost) { set(config, 'pg.host', commander.pgHost); }
-    if(commander.pgDatabase) { set(config, 'pg.database', commander.pgData); }
-    if(commander.pgPort) { set(config, 'pg.port', commander.pgPort); }
-    if(commander.pgUser) { set(config, 'pg.user', commander.pgUser); }
+    if(options.pgHost) { set(config, 'pg.host', options.pgHost); }
+    if(options.pgDatabase) { set(config, 'pg.database', options.pgData); }
+    if(options.pgPort) { set(config, 'pg.port', options.pgPort); }
+    if(options.pgUser) { set(config, 'pg.user', options.pgUser); }
 
-    if(commander.pgSchema) { set(config, 'input.schemas', commander.pgSchema.split(',')); }
-    if(commander.pgSchema) { set(config, 'input.include', commander.includeTables.split(',')); }
-    if(commander.pgSchema) { set(config, 'input.exclude', commander.excludeTables.split(',')); }
+    if(options.pgSchema) { set(config, 'input.schemas', options.pgSchema.split(',')); }
+    if(options.pgSchema) { set(config, 'input.include', options.includeTables.split(',')); }
+    if(options.pgSchema) { set(config, 'input.exclude', options.excludeTables.split(',')); }
 
-    if(commander.out) { set( config, 'output.outDir', commander.out); }
-    if(commander.out) { set( config, 'output.baseUrl', commander.baseUrl); }
-    if(commander.indent) { set( config, 'output.indent', commander.indent); }
-    if(commander.desc) { set( config, 'output.defaultDescription', commander.defaultDescription); }
-    if(commander.additionalProperties) { set( config, 'output.additionalProperties', true); }
-    if(commander.unwrap) { set( config, 'output.unwrap', true); }
+    if(options.out) { set( config, 'output.outDir', options.out); }
+    if(options.out) { set( config, 'output.baseUrl', options.baseUrl); }
+    if(options.indent) { set( config, 'output.indent', options.indent); }
+    if(options.desc) { set( config, 'output.defaultDescription', options.defaultDescription); }
+    if(options.additionalProperties) { set( config, 'output.additionalProperties', true); }
+    if(options.unwrap) { set( config, 'output.unwrap', true); }
 
     if (isEmpty(config)) {
-      commander.help();
+      program.help();
     }
 
     // If no password was supplied prompt for it
@@ -86,7 +88,7 @@ import { IConfiguration } from './config';
         if (config.output?.unwrap && schemas.length === 1) {
           console.log(schemas[0]);
         } else if (schemas.length > 0) {
-          const indentSpaces = commander.indent === undefined ? 2 : commander.indent;
+          const indentSpaces = options.indent === undefined ? 2 : options.indent;
           console.log(JSON.stringify( schemas, null, padStart( '', indentSpaces, ' ' ) ));
         }
       }
