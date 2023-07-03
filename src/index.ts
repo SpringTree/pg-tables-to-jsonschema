@@ -2,7 +2,7 @@ import { promises, constants } from 'fs';
 import { join } from 'path';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import jsonfile from 'jsonfile';
-import mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import pgStructure, { Column, Entity, Schema } from 'pg-structure';
 import { IConfiguration } from './config';
 
