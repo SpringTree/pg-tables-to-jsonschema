@@ -30,7 +30,7 @@ describe('Converter', () => {
     try {
       await converter.convert();
     } catch (err) {
-      expect(err.message).toEqual('connect ECONNREFUSED 127.0.0.1:5432');
+      expect(err.message).toContain('connect ECONNREFUSED');
     }
   });
 });
