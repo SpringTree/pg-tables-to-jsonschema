@@ -354,15 +354,23 @@ export class SchemaConverter {
         return typeDef;
       }
 
+      case 'int':
+      case 'integer':
+      case 'smallint':
+      {
+        const typeDef: JSONSchema7Definition = { type: 'integer', maxLength: column.length };
+        if (isArray) {
+          return { type: 'array', items: typeDef };
+        }
+        return typeDef;
+      }
+
       case 'bigint':
       case 'decimal':
       case 'double precision':
       case 'float8':
-      case 'int':
-      case 'integer':
       case 'numeric':
       case 'real':
-      case 'smallint':
       {
         const typeDef: JSONSchema7Definition = { type: 'number', maxLength: column.length };
         if (isArray) {
