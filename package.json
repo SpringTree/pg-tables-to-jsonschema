@@ -1,6 +1,6 @@
 {
   "name": "pg-tables-to-jsonschema",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A command-line utility and module to turn postgres tables into JSON Schemas",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
