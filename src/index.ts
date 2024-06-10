@@ -3,7 +3,7 @@ import { join } from 'path';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import jsonfile from 'jsonfile';
 import { mkdirp } from 'mkdirp';
-import pgStructure, { Column, Entity, Schema } from 'pg-structure';
+import pgStructure, { Column, Entity, EnumType, Schema } from 'pg-structure';
 import { IConfiguration } from './config';
 
 export class SchemaConverter {
@@ -290,6 +290,7 @@ export class SchemaConverter {
   ) : JSONSchema7Definition {
     const columnType = column.type.name;
     const isArray = column.arrayDimension > 0;
+    const enumType = column.type instanceof EnumType ? column.type as EnumType : undefined;
 
     switch(columnType) {
       case 'bit':
@@ -298,6 +299,7 @@ export class SchemaConverter {
       case 'character':
       case 'character varying':
       case 'text':
+      case 'bytea':
       {
         const typeDef: JSONSchema7Definition = { type: 'string', maxLength: column.length };
         if (isArray) {
@@ -424,6 +426,15 @@ export class SchemaConverter {
 
       default:
       {
+        if (enumType) {
+          const values = enumType.values;
+          const isNumeric = !!enumType.numericType;
+          if (isNumeric) {
+            return { type: 'number', enum: Array.from(values.keys()), description:  `Enumeration: ${columnType}. Values: ${values.join(', ')}` };
+          }
+          return { type: 'string', enum: values, description:  `Enumeration: ${columnType}}. Values: ${values.join(', ')}` };
+        }
+
         console.warn(`Unsupported column type: ${columnType}. Defaulting to null` );
         return { type: 'null' };
       }
