@@ -1,4 +1,4 @@
-import { afterAll, expect, spyOn, test } from "bun:test";
+import { afterAll, beforeEach, expect, spyOn, test } from "bun:test";
 import { chmod, mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -32,6 +32,10 @@ const exampleConfiguration: IConfiguration = {
 const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
 const temporaryFolders: string[] = [];
+
+beforeEach(() => {
+  consoleErrorSpy.mockClear();
+});
 
 afterAll(async () => {
   for (const folder of temporaryFolders) {
@@ -96,7 +100,11 @@ test("fail checking the configuration when the output folder is not writable", a
     output: { outDir: outputFolder },
   });
 
-  expect(converter.checkConfiguration()).rejects.toThrow(`Cannot write to ${outputFolder}`);
+  // Awaited before asserting the log, a rejects assertion does not wait for the check to finish
+  //
+  const checkError = await converter.checkConfiguration().catch((error: unknown) => error);
+
+  expect(checkError).toEqual(new Error(`Cannot write to ${outputFolder}`));
   expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
 });
 
