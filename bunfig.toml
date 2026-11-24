@@ -1,0 +1,10 @@
+# Hoisted node_modules layout, same as our other bun packages, so tools that
+# look for binaries and configs in node_modules/.bin behave like under npm
+#
+# minimumReleaseAge: package quarantine, bun refuses versions published less than
+# 7 days ago (604800 seconds). Enforced by the supply-chain `quarantine` gate,
+# keep in step with min-release-age in .npmrc
+#
+[install]
+linker = "hoisted"
+minimumReleaseAge = 604800

@@ -1,20 +1,25 @@
-import { promises, constants } from 'fs';
-import { join } from 'path';
-import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import jsonfile from 'jsonfile';
-import { mkdirp } from 'mkdirp';
-import pgStructure, { Column, Entity, EnumType, Schema } from 'pg-structure';
-import { IConfiguration } from './config';
+import { constants, promises } from "node:fs";
+import { join } from "node:path";
+import type { JSONSchema7, JSONSchema7Definition } from "json-schema";
+import jsonfile from "jsonfile";
+import { mkdirp } from "mkdirp";
+import pgStructureImport, { type Column, type Entity, EnumType, type Schema } from "pg-structure";
+import type { IConfiguration } from "./config/index.js";
+
+// pg-structure is CommonJS marked as transpiled ESM (__esModule). Importing its default export
+// gives the function under Bun, but the whole module object under Node.js, with the function at .default
+//
+const pgStructure =
+  (pgStructureImport as unknown as { default?: typeof pgStructureImport }).default ??
+  pgStructureImport;
 
 export class SchemaConverter {
-
   /**
    * Creates an instance of SchemaConverter
    *
    * @param {IConfiguration} config The configuration for the database, input and output
    */
-  constructor( private config: IConfiguration ) {
-  }
+  constructor(private config: IConfiguration) {}
 
   /**
    * This helper method will check if the provided configuration is usable
@@ -22,26 +27,26 @@ export class SchemaConverter {
    * @returns {Promise<undefined>}
    */
   public async checkConfiguration(): Promise<undefined> {
-    if ( !this.config ) {
-      throw new Error('No configuration supplied');
+    if (!this.config) {
+      throw new Error("No configuration supplied");
     }
 
-    if ( !this.config.pg?.host || !this.config.pg?.database || !this.config.pg?.user ) {
-      throw new Error( 'Missing PGSQL config' );
+    if (!this.config.pg?.host || !this.config.pg?.database || !this.config.pg?.user) {
+      throw new Error("Missing PGSQL config");
     }
 
-    if ( this.config.output?.outDir ) {
+    if (this.config.output?.outDir) {
       // Create the folder and sub-paths if missing
       //
-      await mkdirp( this.config.output.outDir );
+      await mkdirp(this.config.output.outDir);
 
       // Check the output folder is writeable
       //
       try {
-        await promises.access(this.config.output.outDir, constants.W_OK );
+        await promises.access(this.config.output.outDir, constants.W_OK);
       } catch (err) {
         console.error(err);
-        throw new Error(`Cannot write to ${this.config.output.outDir}`)
+        throw new Error(`Cannot write to ${this.config.output.outDir}`);
       }
     }
 
@@ -64,8 +69,8 @@ export class SchemaConverter {
     // Connect to the database using pgStructure
     // Will throw on error
     //
-    console.warn('Connecting to database...');
-    const dbSchemas = this.config.input?.schemas || ['public'];
+    console.warn("Connecting to database...");
+    const dbSchemas = this.config.input?.schemas || ["public"];
     const db = await pgStructure(
       {
         database: this.config.pg.database,
@@ -78,7 +83,7 @@ export class SchemaConverter {
         includeSchemas: dbSchemas,
         includeSystemSchemas: true,
       },
-    )
+    );
 
     // Prepare the inclusion and exclusion lists
     //
@@ -88,10 +93,11 @@ export class SchemaConverter {
     // Prepare some output settings
     //
     const outputFolder = this.config.output?.outDir;
-    const indentSpaces = this.config.output?.indentSpaces === undefined ? 2 : this.config.output.indentSpaces;
-    const defaultDescription = this.config.output?.defaultDescription || `${new Date()}`;
+    const indentSpaces =
+      this.config.output?.indentSpaces === undefined ? 2 : this.config.output.indentSpaces;
+    const defaultDescription = this.config.output?.defaultDescription || new Date().toString();
     const additionalProperties = this.config.output?.additionalProperties === true;
-    const baseUrl = (this.config.output?.baseUrl || '').replace(/\/$/, '');
+    const baseUrl = (this.config.output?.baseUrl || "").replace(/\/$/, "");
 
     const outputSchemas: JSONSchema7[] = [];
 
@@ -114,7 +120,7 @@ export class SchemaConverter {
           (includedEntities.length === 0 || includedEntities.indexOf(tableName) !== -1)
         ) {
           console.warn(`Processing table ${tableName}`);
-          const jsonSchema = await this.convertEntity( {
+          const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
             defaultDescription,
@@ -133,7 +139,7 @@ export class SchemaConverter {
       // Process all the views in the schema
       //
       for (const view of schema.views) {
-        const viewName = view.name
+        const viewName = view.name;
 
         // Check if the entity is included and/or excluded
         //
@@ -142,7 +148,7 @@ export class SchemaConverter {
           (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
         ) {
           console.warn(`Processing view ${viewName}`);
-          const jsonSchema = await this.convertEntity( {
+          const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
             defaultDescription,
@@ -159,7 +165,7 @@ export class SchemaConverter {
       // Process all the materialized views in the schema
       //
       for (const view of schema.materializedViews) {
-        const viewName = view.name
+        const viewName = view.name;
 
         // Check if the entity is included and/or excluded
         //
@@ -168,7 +174,7 @@ export class SchemaConverter {
           (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
         ) {
           console.warn(`Processing materialized view ${viewName}`);
-          const jsonSchema = await this.convertEntity( {
+          const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
             defaultDescription,
@@ -207,36 +213,34 @@ export class SchemaConverter {
    *     }
    * @returns
    */
-  private async convertEntity(
-    {
-      additionalProperties,
-      baseUrl,
-      defaultDescription,
-      indentSpaces,
-      outputFolder,
-      schemaName,
-      entity,
-    }: {
-      additionalProperties: boolean,
-      baseUrl: string,
-      defaultDescription: string,
-      indentSpaces: number,
-      outputFolder?: string,
-      schemaName: string,
-      entity: Entity,
-    }
-  ) {
+  private async convertEntity({
+    additionalProperties,
+    baseUrl,
+    defaultDescription,
+    indentSpaces,
+    outputFolder,
+    schemaName,
+    entity,
+  }: {
+    additionalProperties: boolean;
+    baseUrl: string;
+    defaultDescription: string;
+    indentSpaces: number;
+    outputFolder?: string;
+    schemaName: string;
+    entity: Entity;
+  }) {
     const entityName = entity.name;
-    const baseName = entityName.replace( `${schemaName}_`, '' );
+    const baseName = entityName.replace(`${schemaName}_`, "");
     const jsonSchema: JSONSchema7 = {
       additionalProperties,
-      $schema: 'http://json-schema.org/draft-07/schema#',
+      $schema: "http://json-schema.org/draft-07/schema#",
       $id: `${baseUrl}/${schemaName}/${entityName}.json`,
       title: baseName,
       description: entity.comment || defaultDescription,
       properties: {},
       required: [],
-      type: 'object',
+      type: "object",
     };
 
     const columns = entity.columns;
@@ -244,8 +248,8 @@ export class SchemaConverter {
       const columnName = column.name;
       const columnType = column.type.name;
 
-      (jsonSchema.properties as {[key: string]: JSONSchema7Definition})[columnName] = {
-        ...this.convertColumnType({ column }) as Record<string, unknown>,
+      (jsonSchema.properties as { [key: string]: JSONSchema7Definition })[columnName] = {
+        ...(this.convertColumnType({ column }) as Record<string, unknown>),
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
         maxLength: column.length,
       };
@@ -281,162 +285,169 @@ export class SchemaConverter {
    *     }
    * @returns {Partial<JSONSchema7Definition>}
    */
-  private convertColumnType(
-    {
-      column,
-    } : {
-      column: Column,
-    }
-  ) : JSONSchema7Definition {
+  private convertColumnType({ column }: { column: Column }): JSONSchema7Definition {
     const columnType = column.type.name;
     const isArray = column.arrayDimension > 0;
-    const enumType = column.type instanceof EnumType ? column.type as EnumType : undefined;
+    const enumType = column.type instanceof EnumType ? (column.type as EnumType) : undefined;
 
-    switch(columnType) {
-      case 'bit':
-      case 'bit varying':
-      case 'varbit':
-      case 'character':
-      case 'character varying':
-      case 'text':
-      case 'bytea':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'string', maxLength: column.length };
+    switch (columnType) {
+      case "bit":
+      case "bit varying":
+      case "varbit":
+      case "character":
+      case "character varying":
+      case "text":
+      case "bytea": {
+        const typeDef: JSONSchema7Definition = { type: "string", maxLength: column.length };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'uuid':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'string', format: 'uuid', maxLength: column.length };
+      case "uuid": {
+        const typeDef: JSONSchema7Definition = {
+          type: "string",
+          format: "uuid",
+          maxLength: column.length,
+        };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'date':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'string', format: 'date', maxLength: column.length };
+      case "date": {
+        const typeDef: JSONSchema7Definition = {
+          type: "string",
+          format: "date",
+          maxLength: column.length,
+        };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'time with time zone':
-      case 'time without time zone':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'string', format: 'time', maxLength: column.length };
+      case "time with time zone":
+      case "time without time zone": {
+        const typeDef: JSONSchema7Definition = {
+          type: "string",
+          format: "time",
+          maxLength: column.length,
+        };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'timestamp with time zone':
-      case 'timestamp without time zone':
-      case 'timestamp':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'string', format: 'date-time', maxLength: column.length };
+      case "timestamp with time zone":
+      case "timestamp without time zone":
+      case "timestamp": {
+        const typeDef: JSONSchema7Definition = {
+          type: "string",
+          format: "date-time",
+          maxLength: column.length,
+        };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'boolean':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'boolean' };
+      case "boolean": {
+        const typeDef: JSONSchema7Definition = { type: "boolean" };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'int':
-      case 'integer':
-      case 'smallint':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'integer', maxLength: column.length };
+      case "int":
+      case "integer":
+      case "smallint": {
+        const typeDef: JSONSchema7Definition = { type: "integer", maxLength: column.length };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'bigint':
-      case 'decimal':
-      case 'double precision':
-      case 'float8':
-      case 'numeric':
-      case 'real':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'number', maxLength: column.length };
+      case "bigint":
+      case "decimal":
+      case "double precision":
+      case "float8":
+      case "numeric":
+      case "real": {
+        const typeDef: JSONSchema7Definition = { type: "number", maxLength: column.length };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'json':
-      case 'jsonb':
-      {
-        const typeDef: JSONSchema7Definition = { type: 'object', properties: {} };
+      case "json":
+      case "jsonb": {
+        const typeDef: JSONSchema7Definition = { type: "object", properties: {} };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      case 'interval':
-      {
+      case "interval": {
         const typeDef: JSONSchema7Definition = {
           oneOf: [
             {
-              type:         'number',
-              description:  'Duration in seconds'
+              type: "number",
+              description: "Duration in seconds",
             },
             {
-              type:         'string',
-              description:  'Descriptive duration i.e. 8 hours'
+              type: "string",
+              description: "Descriptive duration i.e. 8 hours",
             },
             {
-              type:         'object',
-              description:  'Duration object',
+              type: "object",
+              description: "Duration object",
               properties: {
-                years:        { type: 'number' },
-                months:       { type: 'number' },
-                days:         { type: 'number' },
-                hours:        { type: 'number' },
-                minutes:      { type: 'number' },
-                seconds:      { type: 'number' },
-                milliseconds: { type: 'number' }
-              }
+                years: { type: "number" },
+                months: { type: "number" },
+                days: { type: "number" },
+                hours: { type: "number" },
+                minutes: { type: "number" },
+                seconds: { type: "number" },
+                milliseconds: { type: "number" },
+              },
             },
-          ]
+          ],
         };
         if (isArray) {
-          return { type: 'array', items: typeDef };
+          return { type: "array", items: typeDef };
         }
         return typeDef;
       }
 
-      default:
-      {
+      default: {
         if (enumType) {
           const values = enumType.values;
           const isNumeric = !!enumType.numericType;
           if (isNumeric) {
-            return { type: 'number', enum: Array.from(values.keys()), description:  `Enumeration: ${columnType}. Values: ${values.join(', ')}` };
+            return {
+              type: "number",
+              enum: Array.from(values.keys()),
+              description: `Enumeration: ${columnType}. Values: ${values.join(", ")}`,
+            };
           }
-          return { type: 'string', enum: values, description:  `Enumeration: ${columnType}}. Values: ${values.join(', ')}` };
+          return {
+            type: "string",
+            enum: values,
+            description: `Enumeration: ${columnType}}. Values: ${values.join(", ")}`,
+          };
         }
 
-        console.warn(`Unsupported column type: ${columnType}. Defaulting to null` );
-        return { type: 'null' };
+        console.warn(`Unsupported column type: ${columnType}. Defaulting to null`);
+        return { type: "null" };
       }
     }
   }
