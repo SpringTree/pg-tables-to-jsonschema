@@ -1,8 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, expect, spyOn, test } from "bun:test";
+import { chmod, mkdtemp, rm, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { IConfiguration } from "../src/config/index.js";
 import { SchemaConverter } from "../src/index.js";
 
-const exampleConfig: IConfiguration = {
+const exampleConfiguration: IConfiguration = {
   pg: {
     host: "localhost",
     database: "mydb",
@@ -24,56 +27,77 @@ const exampleConfig: IConfiguration = {
   },
 };
 
-describe("Config", () => {
-  test("Config can validate", async () => {
-    const converter = new SchemaConverter(exampleConfig);
-    try {
-      await converter.checkConfiguration();
-    } catch (err) {
-      expect(err).toBeUndefined();
-    }
-  });
+// A failed write check is logged with console.error, silenced here and asserted where relevant
+//
+const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-  test("Missing config", async () => {
-    const converter = new SchemaConverter(undefined as unknown as IConfiguration);
-    try {
-      await converter.checkConfiguration();
-      throw new Error("Should have thrown error");
-    } catch (err) {
-      expect(err).toBeDefined();
-      expect((err as Error).message).toEqual("No configuration supplied");
-    }
-  });
+const temporaryFolders: string[] = [];
 
-  test("Missing database details", async () => {
-    const config: IConfiguration = JSON.parse(JSON.stringify(exampleConfig));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (config as any).pg;
-
-    const converter = new SchemaConverter(config);
-    try {
-      await converter.checkConfiguration();
-      throw new Error("Should have thrown error");
-    } catch (err) {
-      expect(err).toBeDefined();
-      expect((err as Error).message).toEqual("Missing PGSQL config");
-    }
-  });
-
-  // test('Not writeable output folder', async () => {
-  //   const config: IConfiguration = JSON.parse(JSON.stringify(exampleConfig));
-  //   if (!config.output) {
-  //     config.output = {};
-  //   }
-  //   config.output.outDir = './totally-not-a-folder';
-
-  //   const converter = new SchemaConverter(config);
-  //   try {
-  //     await converter.checkConfiguration();
-  //     throw new Error('Should have thrown error');
-  //   } catch (err) {
-  //     expect(err).toBeDefined();
-  //     expect((err as Error).message).toEqual(`Cannot write to ${config.output.outDir}`);
-  //   }
-  // });
+afterAll(async () => {
+  for (const folder of temporaryFolders) {
+    await chmod(folder, 0o700);
+    await rm(folder, { recursive: true, force: true });
+  }
 });
+
+async function createTemporaryFolder() {
+  const folder = await mkdtemp(join(tmpdir(), "pg-tables-to-jsonschema-"));
+  temporaryFolders.push(folder);
+  return folder;
+}
+
+test("successfully check the configuration", async () => {
+  const converter = new SchemaConverter(exampleConfiguration);
+
+  expect(await converter.checkConfiguration()).toBeUndefined();
+});
+
+test("successfully create the output folder when it does not exist", async () => {
+  const outputFolder = join(await createTemporaryFolder(), "nested", "schemas");
+  const converter = new SchemaConverter({
+    ...exampleConfiguration,
+    output: { outDir: outputFolder },
+  });
+
+  await converter.checkConfiguration();
+
+  expect((await stat(outputFolder)).isDirectory()).toBe(true);
+});
+
+test("fail checking the configuration when none is supplied", async () => {
+  const converter = new SchemaConverter(undefined as unknown as IConfiguration);
+
+  expect(converter.checkConfiguration()).rejects.toThrow("No configuration supplied");
+});
+
+test.each(["host", "database", "user"] as const)(
+  "fail checking the configuration when the database %s is missing",
+  async (missingSetting) => {
+    const converter = new SchemaConverter({
+      ...exampleConfiguration,
+      pg: { ...exampleConfiguration.pg, [missingSetting]: undefined },
+    });
+
+    expect(converter.checkConfiguration()).rejects.toThrow("Missing PGSQL config");
+  },
+);
+
+test("fail checking the configuration when the database settings are missing", async () => {
+  const converter = new SchemaConverter({ output: {} } as IConfiguration);
+
+  expect(converter.checkConfiguration()).rejects.toThrow("Missing PGSQL config");
+});
+
+test("fail checking the configuration when the output folder is not writable", async () => {
+  const outputFolder = await createTemporaryFolder();
+  await chmod(outputFolder, 0o500);
+  const converter = new SchemaConverter({
+    ...exampleConfiguration,
+    output: { outDir: outputFolder },
+  });
+
+  expect(converter.checkConfiguration()).rejects.toThrow(`Cannot write to ${outputFolder}`);
+  expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+});
+
+//
