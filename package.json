@@ -47,6 +47,7 @@
     "fmt:fix": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "prepare": "husky",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "type-check": "tsc --noEmit"
@@ -60,12 +61,16 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@types/bun": "^1.4.4",
     "@types/json-schema": "^7.0.15",
     "@types/jsonfile": "^6.1.4",
     "@types/lodash": "^4.14.200",
     "@types/prompts": "^2.4.9",
     "bunup": "^0.16.32",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.1",
     "oxfmt": "^0.79.0",
     "oxlint": "^1.94.0",
     "oxlint-tsgolint": "^7.0.2007",
