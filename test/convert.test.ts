@@ -50,6 +50,7 @@ test("successfully convert all tables, views and materialized views", async () =
   const schemas = await convertToJson(fixtureConfiguration);
 
   expect(schemas.map((schema) => schema.$id)).toEqual([
+    "http://example.com/schema/public/array_check.json",
     "http://example.com/schema/public/audit_entry.json",
     "http://example.com/schema/public/customer_account.json",
     "http://example.com/schema/public/escape_check.json",
@@ -79,6 +80,7 @@ test("successfully convert the public schema when no schemas are configured", as
     includeSystemSchemas: true,
   });
   expect(schemas.map((schema) => schema.$id)).toEqual([
+    "/public/array_check.json",
     "/public/audit_entry.json",
     "/public/customer_account.json",
     "/public/escape_check.json",
@@ -109,6 +111,7 @@ test("successfully skip the excluded entities", async () => {
   });
 
   expect(schemas.map((schema) => schema.title)).toEqual([
+    "array_check",
     "audit_entry",
     "escape_check",
     "HTTPRequestLog",
@@ -135,6 +138,32 @@ test("successfully default to the null type when a column type is unsupported", 
 
   expect(consoleWarnSpy).toHaveBeenCalledWith("Unsupported column type: inet. Defaulting to null");
   expect(schemas[0]?.properties?.["ip_address"]).toMatchObject({ type: "null" });
+});
+
+test("successfully leave out maxLength when a column has no length limit", async () => {
+  const schemas = await new SchemaConverter({
+    ...fixtureConfiguration,
+    input: { include: ["customer_account"] },
+  }).convert();
+  const properties = schemas[0]?.properties as Record<string, JSONSchema7>;
+
+  expect(properties["email"]?.maxLength).toBe(120);
+  expect(Object.keys(properties).filter((name) => "maxLength" in properties[name]!)).toEqual([
+    "email",
+    "country_code",
+    "flags",
+    "feature_mask",
+  ]);
+});
+
+test("successfully report no progress when silent is configured", async () => {
+  await convertToJson({ ...fixtureConfiguration, silent: true });
+
+  // Only the warning about the unsupported inet column remains
+  //
+  expect(consoleWarnSpy.mock.calls).toEqual([
+    ["Unsupported column type: inet. Defaulting to null"],
+  ]);
 });
 
 test("successfully describe with the current date and time when no default description is configured", async () => {

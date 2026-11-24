@@ -22,6 +22,18 @@ export class SchemaConverter {
   constructor(private config: IConfiguration) {}
 
   /**
+   * Reports progress on STDERR, so it does not mix with the schemas on STDOUT.
+   * Disabled with the `silent` configuration setting
+   *
+   * @param {string} message The progress message
+   */
+  private reportProgress(message: string) {
+    if (!this.config.silent) {
+      console.warn(message);
+    }
+  }
+
+  /**
    * This helper method will check if the provided configuration is usable
    *
    * @returns {Promise<undefined>}
@@ -69,7 +81,7 @@ export class SchemaConverter {
     // Connect to the database using pgStructure
     // Will throw on error
     //
-    console.warn("Connecting to database...");
+    this.reportProgress("Connecting to database...");
     const dbSchemas = this.config.input?.schemas || ["public"];
     const db = await pgStructure(
       {
@@ -104,7 +116,7 @@ export class SchemaConverter {
     // Iterate all the schemas
     //
     for (const dbSchema of dbSchemas) {
-      console.warn(`Processing schema ${dbSchema}`);
+      this.reportProgress(`Processing schema ${dbSchema}`);
       const schema = db.get(dbSchema) as Schema;
       const schemaName = schema.name;
 
@@ -119,7 +131,7 @@ export class SchemaConverter {
           excludedEntities.indexOf(tableName) === -1 &&
           (includedEntities.length === 0 || includedEntities.indexOf(tableName) !== -1)
         ) {
-          console.warn(`Processing table ${tableName}`);
+          this.reportProgress(`Processing table ${tableName}`);
           const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
@@ -132,7 +144,7 @@ export class SchemaConverter {
 
           outputSchemas.push(jsonSchema);
         } else {
-          console.warn(`Skipping excluded table ${tableName}`);
+          this.reportProgress(`Skipping excluded table ${tableName}`);
         }
       }
 
@@ -147,7 +159,7 @@ export class SchemaConverter {
           excludedEntities.indexOf(viewName) === -1 &&
           (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
         ) {
-          console.warn(`Processing view ${viewName}`);
+          this.reportProgress(`Processing view ${viewName}`);
           const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
@@ -173,7 +185,7 @@ export class SchemaConverter {
           excludedEntities.indexOf(viewName) === -1 &&
           (includedEntities.length === 0 || includedEntities.indexOf(viewName) !== -1)
         ) {
-          console.warn(`Processing materialized view ${viewName}`);
+          this.reportProgress(`Processing materialized view ${viewName}`);
           const jsonSchema = await this.convertEntity({
             additionalProperties,
             baseUrl,
@@ -251,7 +263,6 @@ export class SchemaConverter {
       (jsonSchema.properties as { [key: string]: JSONSchema7Definition })[columnName] = {
         ...(this.convertColumnType({ column }) as Record<string, unknown>),
         description: `${column.comment || defaultDescription}. Database type: ${columnType}. Default value: ${column.default}`,
-        maxLength: column.length,
       };
 
       // Check if the column is required
@@ -290,15 +301,22 @@ export class SchemaConverter {
     const isArray = column.arrayDimension > 0;
     const enumType = column.type instanceof EnumType ? (column.type as EnumType) : undefined;
 
+    // The cases are the type names PostgreSQL reports, aliases like int or float8 never occur
+    //
     switch (columnType) {
       case "bit":
       case "bit varying":
-      case "varbit":
       case "character":
       case "character varying":
       case "text":
       case "bytea": {
-        const typeDef: JSONSchema7Definition = { type: "string", maxLength: column.length };
+        // Character types limit the length in characters, bit types in bits. Columns without a
+        // length limit, like text, have no maxLength
+        //
+        const typeDef: JSONSchema7Definition =
+          column.length === undefined
+            ? { type: "string" }
+            : { type: "string", maxLength: column.length };
         if (isArray) {
           return { type: "array", items: typeDef };
         }
@@ -309,7 +327,6 @@ export class SchemaConverter {
         const typeDef: JSONSchema7Definition = {
           type: "string",
           format: "uuid",
-          maxLength: column.length,
         };
         if (isArray) {
           return { type: "array", items: typeDef };
@@ -321,7 +338,6 @@ export class SchemaConverter {
         const typeDef: JSONSchema7Definition = {
           type: "string",
           format: "date",
-          maxLength: column.length,
         };
         if (isArray) {
           return { type: "array", items: typeDef };
@@ -334,7 +350,6 @@ export class SchemaConverter {
         const typeDef: JSONSchema7Definition = {
           type: "string",
           format: "time",
-          maxLength: column.length,
         };
         if (isArray) {
           return { type: "array", items: typeDef };
@@ -343,12 +358,10 @@ export class SchemaConverter {
       }
 
       case "timestamp with time zone":
-      case "timestamp without time zone":
-      case "timestamp": {
+      case "timestamp without time zone": {
         const typeDef: JSONSchema7Definition = {
           type: "string",
           format: "date-time",
-          maxLength: column.length,
         };
         if (isArray) {
           return { type: "array", items: typeDef };
@@ -363,11 +376,9 @@ export class SchemaConverter {
         }
         return typeDef;
       }
-
-      case "int":
       case "integer":
       case "smallint": {
-        const typeDef: JSONSchema7Definition = { type: "integer", maxLength: column.length };
+        const typeDef: JSONSchema7Definition = { type: "integer" };
         if (isArray) {
           return { type: "array", items: typeDef };
         }
@@ -375,12 +386,10 @@ export class SchemaConverter {
       }
 
       case "bigint":
-      case "decimal":
       case "double precision":
-      case "float8":
       case "numeric":
       case "real": {
-        const typeDef: JSONSchema7Definition = { type: "number", maxLength: column.length };
+        const typeDef: JSONSchema7Definition = { type: "number" };
         if (isArray) {
           return { type: "array", items: typeDef };
         }
@@ -429,21 +438,14 @@ export class SchemaConverter {
       }
 
       default: {
+        // PostgreSQL enum values are always text
+        //
         if (enumType) {
-          const values = enumType.values;
-          const isNumeric = !!enumType.numericType;
-          if (isNumeric) {
-            return {
-              type: "number",
-              enum: Array.from(values.keys()),
-              description: `Enumeration: ${columnType}. Values: ${values.join(", ")}`,
-            };
+          const typeDef: JSONSchema7Definition = { type: "string", enum: enumType.values };
+          if (isArray) {
+            return { type: "array", items: typeDef };
           }
-          return {
-            type: "string",
-            enum: values,
-            description: `Enumeration: ${columnType}}. Values: ${values.join(", ")}`,
-          };
+          return typeDef;
         }
 
         console.warn(`Unsupported column type: ${columnType}. Defaulting to null`);

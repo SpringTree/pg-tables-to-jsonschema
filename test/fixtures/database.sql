@@ -49,6 +49,21 @@ CREATE TABLE public.audit_entry (
   id integer NOT NULL
 );
 
+-- An array column for every mapped type, the converter wraps the element type in an array schema
+--
+CREATE TABLE public.array_check (
+  id integer NOT NULL,
+  codes character varying(20)[],
+  ids uuid[],
+  dates date[],
+  times time without time zone[],
+  moments timestamp with time zone[],
+  switches boolean[],
+  amounts numeric[],
+  documents jsonb[],
+  durations interval[]
+);
+
 -- Comments, defaults and enum values with characters that need escaping in the JSON output:
 -- quotes, backticks, template placeholders, backslashes and line breaks.
 -- Known pg-structure 7.15 limitation: its enum value parser drops a value with a line break

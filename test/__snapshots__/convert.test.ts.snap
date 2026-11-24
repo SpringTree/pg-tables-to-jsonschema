@@ -3,6 +3,128 @@
 exports[`successfully convert all tables, views and materialized views 1`] = `
 [
   {
+    "$id": "http://example.com/schema/public/array_check.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "amounts": {
+        "description": "Fixture. Database type: numeric. Default value: null",
+        "items": {
+          "type": "number",
+        },
+        "type": "array",
+      },
+      "codes": {
+        "description": "Fixture. Database type: character varying. Default value: null",
+        "items": {
+          "maxLength": 20,
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "dates": {
+        "description": "Fixture. Database type: date. Default value: null",
+        "items": {
+          "format": "date",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "documents": {
+        "description": "Fixture. Database type: jsonb. Default value: null",
+        "items": {
+          "properties": {},
+          "type": "object",
+        },
+        "type": "array",
+      },
+      "durations": {
+        "description": "Fixture. Database type: interval. Default value: null",
+        "items": {
+          "oneOf": [
+            {
+              "description": "Duration in seconds",
+              "type": "number",
+            },
+            {
+              "description": "Descriptive duration i.e. 8 hours",
+              "type": "string",
+            },
+            {
+              "description": "Duration object",
+              "properties": {
+                "days": {
+                  "type": "number",
+                },
+                "hours": {
+                  "type": "number",
+                },
+                "milliseconds": {
+                  "type": "number",
+                },
+                "minutes": {
+                  "type": "number",
+                },
+                "months": {
+                  "type": "number",
+                },
+                "seconds": {
+                  "type": "number",
+                },
+                "years": {
+                  "type": "number",
+                },
+              },
+              "type": "object",
+            },
+          ],
+        },
+        "type": "array",
+      },
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+      "ids": {
+        "description": "Fixture. Database type: uuid. Default value: null",
+        "items": {
+          "format": "uuid",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "moments": {
+        "description": "Fixture. Database type: timestamp with time zone. Default value: null",
+        "items": {
+          "format": "date-time",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "switches": {
+        "description": "Fixture. Database type: boolean. Default value: null",
+        "items": {
+          "type": "boolean",
+        },
+        "type": "array",
+      },
+      "times": {
+        "description": "Fixture. Database type: time without time zone. Default value: null",
+        "items": {
+          "format": "time",
+          "type": "string",
+        },
+        "type": "array",
+      },
+    },
+    "required": [
+      "id",
+    ],
+    "title": "array_check",
+    "type": "object",
+  },
+  {
     "$id": "http://example.com/schema/public/audit_entry.json",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": false,
@@ -264,12 +386,15 @@ lines with \`tick\`, \${braces} and \\u0041. Database type: text. Default value:
     "properties": {
       "history": {
         "description": "Fixture. Database type: order_status. Default value: null",
-        "enum": [
-          "new",
-          "paid",
-          "shipped",
-        ],
-        "type": "string",
+        "items": {
+          "enum": [
+            "new",
+            "paid",
+            "shipped",
+          ],
+          "type": "string",
+        },
+        "type": "array",
       },
       "id": {
         "description": "Fixture. Database type: integer. Default value: null",
