@@ -1,8 +1,6 @@
 import { constants, promises } from "node:fs";
 import { join } from "node:path";
 import type { JSONSchema7, JSONSchema7Definition } from "json-schema";
-import jsonfile from "jsonfile";
-import { mkdirp } from "mkdirp";
 import pgStructureImport, { type Column, type Entity, EnumType, type Schema } from "pg-structure";
 import type { IConfiguration } from "./config/index.js";
 
@@ -50,7 +48,7 @@ export class SchemaConverter {
     if (this.config.output?.outDir) {
       // Create the folder and sub-paths if missing
       //
-      await mkdirp(this.config.output.outDir);
+      await promises.mkdir(this.config.output.outDir, { recursive: true });
 
       // Check the output folder is writeable
       //
@@ -276,9 +274,9 @@ export class SchemaConverter {
     //
     if (outputFolder) {
       const folderName = join(outputFolder, schemaName);
-      await mkdirp(folderName);
+      await promises.mkdir(folderName, { recursive: true });
       const fileName = join(folderName, `${entityName}.json`);
-      await jsonfile.writeFile(fileName, jsonSchema, { spaces: indentSpaces });
+      await promises.writeFile(fileName, `${JSON.stringify(jsonSchema, null, indentSpaces)}\n`);
     }
 
     return jsonSchema;

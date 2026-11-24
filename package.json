@@ -53,16 +53,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "jsonfile": "^6.1.0",
-    "mkdirp": "^3.0.1",
+    "@types/json-schema": "^7.0.15",
     "pg-structure": "^7.15.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@types/bun": "^1.4.4",
-    "@types/json-schema": "^7.0.15",
-    "@types/jsonfile": "^6.1.4",
     "bunup": "^0.16.32",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.1",
