@@ -1,0 +1,47 @@
+# Supply-chain gates from https://github.com/SpringTree/springtree-ci-workflows
+# Required status checks: supply-chain / secrets, licences, code, quarantine
+name: compliance
+
+on:
+  pull_request:
+    # Required: drafts are skipped below, so this is what runs the gates once
+    # a pull request is marked ready. See "Draft pull requests".
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      full-history:
+        description: Scan all history rather than the pull request's range
+        type: boolean
+        # A manual run has no pull request range, so it scans all history
+        # whatever this says; true states what actually happens.
+        default: true
+  schedule:
+    - cron: "0 5 * * 1"
+
+# A second push to the same pull request makes the first run's answer
+# irrelevant, so cancel it rather than paying for both. Never cancel the
+# scheduled run — it has no successor to replace it.
+concurrency:
+  group: compliance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  supply-chain:
+    # Skip pull requests from forks and drafts — see "Public repositories and
+    # forks" and "Draft pull requests".
+    if: >-
+      github.event_name != 'pull_request'
+      || (github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft)
+    uses: SpringTree/springtree-ci-workflows/.github/workflows/supply-chain.yml@main
+    # The shared workflow's licences job asks for id-token: write to read
+    # private packages from the springtree-labs registry. A called workflow
+    # cannot ask for more than this grants, so without it no gate starts. It
+    # is used only where a committed .npmrc points at that registry.
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      # `github.event.inputs`, not `inputs`: the latter does not exist on a
+      # pull_request event, and referencing it fails the workflow before any
+      # job starts.
+      full-history: ${{ github.event_name == 'schedule' || github.event.inputs.full-history == 'true' }}
