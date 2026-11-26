@@ -44,3 +44,9 @@ jobs:
       - run: bun run test
       - name: Run bundle with node
         run: node dist/cli.js --version
+      # Loads the package by its own name, so the exports in package.json are used like in a
+      # consumer project. require() of an ES module needs a default condition (node.js 22.12+)
+      - name: Import and require the package with node
+        run: |
+          node --input-type=module -e 'await import("pg-tables-to-jsonschema")'
+          node -e 'require("pg-tables-to-jsonschema")'
