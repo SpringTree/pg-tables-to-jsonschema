@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/SpringTree/pg-tables-to-jsonschema/compare/v2.0.0...v2.0.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **package:** allow require() on node.js 22.12 and later ([#30](https://github.com/SpringTree/pg-tables-to-jsonschema/issues/30)) ([2f4f99a](https://github.com/SpringTree/pg-tables-to-jsonschema/commit/2f4f99a697ee2c2f408d5d8c8bf1e6f96f057a81))
+
 ## [2.0.0](https://github.com/SpringTree/pg-tables-to-jsonschema/compare/v1.1.3...v2.0.0) (2026-11-26)
 
 
