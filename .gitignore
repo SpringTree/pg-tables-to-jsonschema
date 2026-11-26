@@ -1,17 +1,11 @@
 node_modules
+coverage
+dist
 .DS_Store
 *.log
-.vscode
 .idea
-.eslintcache
 
-# Test coverage
-coverage
-
-# Ignore TS output
-lib
-tsconfig.tsbuildinfo
-
-# Some test files I use
+# Test configurations and output
 /*-config.json
+!/release-please-config.json
 test/dump

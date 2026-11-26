@@ -1,0 +1,514 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`successfully convert all tables, views and materialized views 1`] = `
+[
+  {
+    "$id": "http://example.com/schema/public/array_check.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "amounts": {
+        "description": "Fixture. Database type: numeric. Default value: null",
+        "items": {
+          "type": "number",
+        },
+        "type": "array",
+      },
+      "codes": {
+        "description": "Fixture. Database type: character varying. Default value: null",
+        "items": {
+          "maxLength": 20,
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "dates": {
+        "description": "Fixture. Database type: date. Default value: null",
+        "items": {
+          "format": "date",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "documents": {
+        "description": "Fixture. Database type: jsonb. Default value: null",
+        "items": {
+          "properties": {},
+          "type": "object",
+        },
+        "type": "array",
+      },
+      "durations": {
+        "description": "Fixture. Database type: interval. Default value: null",
+        "items": {
+          "oneOf": [
+            {
+              "description": "Duration in seconds",
+              "type": "number",
+            },
+            {
+              "description": "Descriptive duration i.e. 8 hours",
+              "type": "string",
+            },
+            {
+              "description": "Duration object",
+              "properties": {
+                "days": {
+                  "type": "number",
+                },
+                "hours": {
+                  "type": "number",
+                },
+                "milliseconds": {
+                  "type": "number",
+                },
+                "minutes": {
+                  "type": "number",
+                },
+                "months": {
+                  "type": "number",
+                },
+                "seconds": {
+                  "type": "number",
+                },
+                "years": {
+                  "type": "number",
+                },
+              },
+              "type": "object",
+            },
+          ],
+        },
+        "type": "array",
+      },
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+      "ids": {
+        "description": "Fixture. Database type: uuid. Default value: null",
+        "items": {
+          "format": "uuid",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "moments": {
+        "description": "Fixture. Database type: timestamp with time zone. Default value: null",
+        "items": {
+          "format": "date-time",
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "switches": {
+        "description": "Fixture. Database type: boolean. Default value: null",
+        "items": {
+          "type": "boolean",
+        },
+        "type": "array",
+      },
+      "times": {
+        "description": "Fixture. Database type: time without time zone. Default value: null",
+        "items": {
+          "format": "time",
+          "type": "string",
+        },
+        "type": "array",
+      },
+    },
+    "required": [
+      "id",
+    ],
+    "title": "array_check",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/public/audit_entry.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+    },
+    "required": [
+      "id",
+    ],
+    "title": "audit_entry",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/public/customer_account.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "A customer's account",
+    "properties": {
+      "avatar": {
+        "description": "Fixture. Database type: bytea. Default value: null",
+        "type": "string",
+      },
+      "balance": {
+        "description": "Fixture. Database type: numeric. Default value: null",
+        "type": "number",
+      },
+      "birth_date": {
+        "description": "Fixture. Database type: date. Default value: null",
+        "format": "date",
+        "type": "string",
+      },
+      "country_code": {
+        "description": "Fixture. Database type: character. Default value: null",
+        "maxLength": 2,
+        "type": "string",
+      },
+      "created_at": {
+        "description": "Fixture. Database type: timestamp with time zone. Default value: now()",
+        "format": "date-time",
+        "type": "string",
+      },
+      "display_name": {
+        "description": "Fixture. Database type: text. Default value: null",
+        "type": "string",
+      },
+      "email": {
+        "description": "The customer's e-mail. Database type: character varying. Default value: null",
+        "maxLength": 120,
+        "type": "string",
+      },
+      "feature_mask": {
+        "description": "Fixture. Database type: bit varying. Default value: null",
+        "maxLength": 8,
+        "type": "string",
+      },
+      "flags": {
+        "description": "Fixture. Database type: bit. Default value: null",
+        "maxLength": 3,
+        "type": "string",
+      },
+      "id": {
+        "description": "Fixture. Database type: uuid. Default value: null",
+        "format": "uuid",
+        "type": "string",
+      },
+      "ip_address": {
+        "description": "Fixture. Database type: inet. Default value: null",
+        "type": "null",
+      },
+      "is_active": {
+        "description": "Fixture. Database type: boolean. Default value: true",
+        "type": "boolean",
+      },
+      "login_count": {
+        "description": "Fixture. Database type: integer. Default value: 0",
+        "type": "integer",
+      },
+      "lucky_numbers": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "items": {
+          "type": "integer",
+        },
+        "type": "array",
+      },
+      "preferences": {
+        "description": "Fixture. Database type: jsonb. Default value: '{}'",
+        "properties": {},
+        "type": "object",
+      },
+      "rank": {
+        "description": "Fixture. Database type: smallint. Default value: null",
+        "type": "integer",
+      },
+      "ratio": {
+        "description": "Fixture. Database type: real. Default value: null",
+        "type": "number",
+      },
+      "raw_preferences": {
+        "description": "Fixture. Database type: json. Default value: null",
+        "properties": {},
+        "type": "object",
+      },
+      "score": {
+        "description": "Fixture. Database type: double precision. Default value: null",
+        "type": "number",
+      },
+      "tags": {
+        "description": "Fixture. Database type: text. Default value: null",
+        "items": {
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "updated_at": {
+        "description": "Fixture. Database type: timestamp without time zone. Default value: null",
+        "format": "date-time",
+        "type": "string",
+      },
+      "visits": {
+        "description": "Fixture. Database type: bigint. Default value: null",
+        "type": "number",
+      },
+      "wakes_at": {
+        "description": "Fixture. Database type: time without time zone. Default value: null",
+        "format": "time",
+        "type": "string",
+      },
+      "wakes_at_tz": {
+        "description": "Fixture. Database type: time with time zone. Default value: null",
+        "format": "time",
+        "type": "string",
+      },
+    },
+    "required": [
+      "id",
+      "email",
+      "country_code",
+    ],
+    "title": "customer_account",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/public/escape_check.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Table with \`backticks\`, \${braces}, a \\ backslash and it's quoted",
+    "properties": {
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+      "note": {
+        "description": 
+"Two
+lines with \`tick\`, \${braces} and \\u0041. Database type: text. Default value: 'it''s \`x\` \${y} \\u0041'"
+,
+        "type": "string",
+      },
+      "style": {
+        "description": "Fixture. Database type: quote_style. Default value: null",
+        "enum": [
+          "it's",
+          "back\\\\slash",
+          "tick\`",
+          "\${placeholder}",
+        ],
+        "type": "string",
+      },
+    },
+    "required": [
+      "id",
+    ],
+    "title": "escape_check",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/public/HTTPRequestLog.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "id": {
+        "description": "Fixture. Database type: bigint. Default value: null",
+        "type": "number",
+      },
+      "status": {
+        "description": "Fixture. Database type: order_status. Default value: null",
+        "enum": [
+          "new",
+          "paid",
+          "shipped",
+        ],
+        "type": "string",
+      },
+      "took": {
+        "description": "Fixture. Database type: interval. Default value: null",
+        "oneOf": [
+          {
+            "description": "Duration in seconds",
+            "type": "number",
+          },
+          {
+            "description": "Descriptive duration i.e. 8 hours",
+            "type": "string",
+          },
+          {
+            "description": "Duration object",
+            "properties": {
+              "days": {
+                "type": "number",
+              },
+              "hours": {
+                "type": "number",
+              },
+              "milliseconds": {
+                "type": "number",
+              },
+              "minutes": {
+                "type": "number",
+              },
+              "months": {
+                "type": "number",
+              },
+              "seconds": {
+                "type": "number",
+              },
+              "years": {
+                "type": "number",
+              },
+            },
+            "type": "object",
+          },
+        ],
+      },
+      "urgency": {
+        "description": "Fixture. Database type: priority. Default value: null",
+        "enum": [
+          "low",
+          "high",
+        ],
+        "type": "string",
+      },
+    },
+    "required": [
+      "id",
+    ],
+    "title": "HTTPRequestLog",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/shop/sales_order.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "An order placed in the shop",
+    "properties": {
+      "history": {
+        "description": "Fixture. Database type: order_status. Default value: null",
+        "items": {
+          "enum": [
+            "new",
+            "paid",
+            "shipped",
+          ],
+          "type": "string",
+        },
+        "type": "array",
+      },
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+      "payload": {
+        "description": "Fixture. Database type: json. Default value: null",
+        "properties": {},
+        "type": "object",
+      },
+      "processing_time": {
+        "description": "Fixture. Database type: interval. Default value: null",
+        "oneOf": [
+          {
+            "description": "Duration in seconds",
+            "type": "number",
+          },
+          {
+            "description": "Descriptive duration i.e. 8 hours",
+            "type": "string",
+          },
+          {
+            "description": "Duration object",
+            "properties": {
+              "days": {
+                "type": "number",
+              },
+              "hours": {
+                "type": "number",
+              },
+              "milliseconds": {
+                "type": "number",
+              },
+              "minutes": {
+                "type": "number",
+              },
+              "months": {
+                "type": "number",
+              },
+              "seconds": {
+                "type": "number",
+              },
+              "years": {
+                "type": "number",
+              },
+            },
+            "type": "object",
+          },
+        ],
+      },
+      "status": {
+        "description": "Fixture. Database type: order_status. Default value: null",
+        "enum": [
+          "new",
+          "paid",
+          "shipped",
+        ],
+        "type": "string",
+      },
+    },
+    "required": [
+      "id",
+      "status",
+    ],
+    "title": "sales_order",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/shop/paid_orders.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "id": {
+        "description": "Fixture. Database type: integer. Default value: null",
+        "type": "integer",
+      },
+      "status": {
+        "description": "Fixture. Database type: order_status. Default value: null",
+        "enum": [
+          "new",
+          "paid",
+          "shipped",
+        ],
+        "type": "string",
+      },
+    },
+    "required": [],
+    "title": "paid_orders",
+    "type": "object",
+  },
+  {
+    "$id": "http://example.com/schema/shop/order_totals.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "description": "Fixture",
+    "properties": {
+      "status": {
+        "description": "Fixture. Database type: order_status. Default value: null",
+        "enum": [
+          "new",
+          "paid",
+          "shipped",
+        ],
+        "type": "string",
+      },
+      "total": {
+        "description": "Fixture. Database type: bigint. Default value: null",
+        "type": "number",
+      },
+    },
+    "required": [],
+    "title": "order_totals",
+    "type": "object",
+  },
+]
+`;

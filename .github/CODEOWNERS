@@ -1,0 +1,14 @@
+# Code owners for this repository. The last matching line wins.
+#
+# A line only takes effect when the team has write access to the repository
+# and a ruleset on the default branch requires review from code owners.
+#
+# Supply-chain policy is reviewed by the Security Officers:
+# - .gitleaksignore accepts a secret-scan finding as not a secret
+# - licence-exemptions.json accepts a package despite its licence
+# - the compliance caller decides which gates run and against which version
+# - this file decides who reviews everything else
+/.github/CODEOWNERS                 @SpringTree/security-officers
+/.github/workflows/compliance.yml   @SpringTree/security-officers
+/.gitleaksignore                    @SpringTree/security-officers
+/licence-exemptions.json            @SpringTree/security-officers

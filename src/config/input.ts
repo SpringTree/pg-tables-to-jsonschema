@@ -18,7 +18,7 @@ export interface IInputConfiguration {
    *
    * @type {string[]}
    */
-  include?: string[]
+  include?: string[];
 
   /**
    * List of structure objects to exclude in the conversion.
@@ -26,5 +26,5 @@ export interface IInputConfiguration {
    *
    * @type {string[]}
    */
-  exclude?: string[]
+  exclude?: string[];
 }

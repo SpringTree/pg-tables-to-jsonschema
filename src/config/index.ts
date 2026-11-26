@@ -1,6 +1,6 @@
-import { IInputConfiguration } from './input';
-import { IOutputConfiguration } from './output';
-import { IDatabaseConfiguration } from './pg';
+import type { IInputConfiguration } from "./input.js";
+import type { IOutputConfiguration } from "./output.js";
+import type { IDatabaseConfiguration } from "./pg.js";
 
 /**
  * The configuration for the schema conversion process which details

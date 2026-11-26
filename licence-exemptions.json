@@ -1,0 +1,7 @@
+{
+  "lightningcss@1": {
+    "licence": "MPL-2.0",
+    "reason": "Weak file-level copyleft. CSS transformer that the bunup bundler depends on directly. Build time only, used unmodified, never in the published package",
+    "withOptionalDependencies": true
+  }
+}

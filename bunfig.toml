@@ -1,0 +1,27 @@
+# Hoisted node_modules layout, same as our other bun packages, so tools that
+# look for binaries and configs in node_modules/.bin behave like under npm
+#
+# minimumReleaseAge: package quarantine, bun refuses versions published less than
+# 7 days ago (604800 seconds). Enforced by the supply-chain `quarantine` gate,
+# keep in step with min-release-age in .npmrc
+#
+[install]
+linker = "hoisted"
+minimumReleaseAge = 604800
+
+# Tests:
+# - preload replaces the database connection with the fixture database before any test file
+#   loads, so tests never connect to a real database. See test/helpers/fixture-database.ts
+# - coverage runs with every `bun test`. The text report prints in the terminal, the lcov
+#   report in coverage/ is for editor integrations. Test helpers are not measured
+# - coverageThreshold fails the run when a single source file drops below 90% of its lines
+#   or functions
+#
+[test]
+coverage = true
+coverageDir = "coverage"
+coveragePathIgnorePatterns = ["test/**"]
+coverageReporter = ["text", "lcov"]
+coverageSkipTestFiles = true
+coverageThreshold = { lines = 0.9, functions = 0.9 }
+preload = ["./test/helpers/fixture-database.ts"]

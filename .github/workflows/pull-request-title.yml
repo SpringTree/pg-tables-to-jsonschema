@@ -1,0 +1,21 @@
+# Pull request title check from https://github.com/SpringTree/springtree-ci-workflows
+# Squash merges land the pull request as one commit, which release-please reads.
+# Required status check: pull-request-title / conventional
+name: pull-request-title
+
+on:
+  pull_request:
+    # edited reruns the check when only the title changes.
+    types: [opened, edited, reopened, synchronize]
+
+# A newer title or push makes the running check irrelevant.
+concurrency:
+  group: pull-request-title-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pull-request-title:
+    uses: SpringTree/springtree-ci-workflows/.github/workflows/pull-request-title.yml@main
+    permissions:
+      contents: read
+      pull-requests: read
